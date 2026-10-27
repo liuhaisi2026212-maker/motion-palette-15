@@ -120,7 +120,15 @@ export const STYLES = [
       { key: 'score', label: '计分词', type: 'text', max: 6, tip: '只能英文，左上角，原片是 SCORE' },
     ],
     example: { title: '柳爷闯关', ribbon: '第一关', speaker: 'AI精灵', line: '把AI讲成人话！', press: 'TAP TO START', score: 'LIKES' } },
-  { id: '22-hud', name: '赛博 HUD', en: 'Cyber HUD', work: '隼眼-9 · 目标锁定' },
+  { id: '22-hud', name: '赛博 HUD', en: 'Cyber HUD', work: '隼眼-9 · 目标锁定', ready: true,
+    about: '科幻电影里的卫星控制台：系统自检、雷达扫过地球、发现信号、比对候选目标，最后全屏变橙、锁定。适合科技、数据、AI、悬念揭晓类开场。',
+    fields: [
+      { key: 'sysEn', label: '系统名（英文）', type: 'text', max: 12, tip: '左上角和地球上的卫星标签' },
+      { key: 'sysCn', label: '系统名（中文）', type: 'text', max: 14, tip: '用「 · 」隔开两段，比如「柳爷 · 选题雷达系统」' },
+      { key: 'lockCn', label: '锁定大字（中文）', type: 'text', max: 4 }, { key: 'lockEn', label: '锁定大字（英文）', type: 'text', max: 8 },
+      { key: 'kind', label: '锁定对象（英文）', type: 'text', max: 8, tip: '大字上方的小词，原片是 TARGET' },
+    ],
+    example: { sysEn: 'LIUYE-AI', sysCn: '柳爷 · 选题雷达系统', lockCn: '爆款锁定', lockEn: 'LOCKED', kind: 'TOPIC' } },
 ];
 
 // 把用户或 AI 给的配置按字段规则收拾干净：去掉不认识的键、截断超长、颜色不合法就丢掉
