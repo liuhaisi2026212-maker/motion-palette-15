@@ -182,7 +182,7 @@ $('reset').onclick = () => { cfg = {}; fillForm(); syncJson(); reload(); };
 
 // ---------- 导出：逐帧渲染 → WebCodecs 编码 H.264 + AAC → MP4（不依赖电脑快慢，帧不会丢）
 async function frameSource(w) {
-  const d = w.document, cv = d.querySelector('canvas#out, canvas#gl, canvas#c');
+  const d = w.document, cv = d.querySelector('canvas#out, canvas#gl, canvas#c') || [...d.querySelectorAll('canvas')].sort((x, y) => y.width * y.height - x.width * x.height)[0];
   if (cv) return () => cv;
   const svg = d.querySelector('svg'); if (!svg) throw new Error('找不到画面');
   // SVG 片子：把字体内嵌后栅格化

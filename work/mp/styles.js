@@ -54,7 +54,14 @@ export const STYLES = [
     ],
     example: { word: 'LIUYE', caption: ['THINK', 'MAKE', 'SHARE'], zh: ['思考', '动手', '分享'], labels: [['IDEA', '想'], ['DO', '做'], ['SHOW', '秀']],
       header: '把 AI 讲成人话 · 第 09 期', footer: 'LIUYE STUDIO · 10 SECONDS · 20 BEATS', counter: 'BEAT', blue: '#0B6E4F' } },
-  { id: '10-synthwave', name: '复古 Synthwave', en: 'Synthwave', work: 'NEON DRIVE「霓虹夜驰 1986」' },
+  { id: '10-synthwave', name: '复古 Synthwave', en: 'Synthwave', work: 'NEON DRIVE「霓虹夜驰 1986」', ready: true,
+    about: '80 年代录像带开场：PLAY 键、霓虹网格公路、跑车冲向落日，铬金大字砸下来，霓虹手写字一笔写出，最后 STOP。适合复古、夜生活、音乐、汽车、游戏主题。',
+    fields: [
+      { key: 'title', label: '铬金大字', type: 'text', max: 10, tip: '英文 4–10 个字母或中文 2–4 个字（中文会用原片的中文铬字排法）' },
+      { key: 'script', label: '霓虹手写字', type: 'text', max: 10, tip: '只能英文，一个词最好看，原片是 Midnight' },
+      { key: 'tag', label: '顶部小字', type: 'text', max: 32 },
+    ],
+    example: { title: '柳爷夜驰', script: 'Liuye', tag: 'SUMMER 2026  ·  把 AI 讲成人话' } },
   { id: '12-aurora-glass', name: '弥散玻璃', en: 'Aurora Glass', work: 'Aurora「思考，自有光」', ready: true,
     about: '流动的极光光斑上叠着几张磨砂玻璃卡片，演一段 AI 助手对话，最后卡片散开，玻璃镜头变成品牌名的一部分。适合 AI 产品、App、科技品牌。',
     fields: [
