@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>film</title>
+<style>
+/* 需要的字体在这里声明（字体文件放 fonts/ 里，只用可商用的开源字体；examples/assets/fonts 里有几款现成的） */
+/* @font-face { font-family: 'ZCOOL KuaiLe'; src: url('fonts/ZCOOLKuaiLe-Regular.ttf'); font-display: block; } */
+html, body { margin: 0; background: #000; overflow: hidden; }
+canvas { display: block; }
+</style></head>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<body><canvas></canvas>
+<script type="module">
+import { run } from './lib/core.js';
+import film from './film.js';
+run(film);
+</script></body></html>

@@ -64,3 +64,6 @@ const jit = (t, i) => { const r = rng(Math.floor(t * 6) * 31 + i); return [(r() 
 
 ## 配乐
 黑胶底噪 + 爵士 boom-bap 鼓；纸张摩擦、剪刀咔嚓、拍桌、卡通「啵」。
+
+## 样片源码
+`examples/films/collage-漫游周刊/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

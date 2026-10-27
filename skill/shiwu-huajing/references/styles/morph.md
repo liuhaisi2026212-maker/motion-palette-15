@@ -71,3 +71,6 @@ const circleP = Array.from({ length: 200 }, (_, i) => { const a = i / 200 * Math
 
 ## 参考
 `examples/kits/flat/kit.js` 里的转场（方块放大成下一场底色）可以和形变结合。
+
+## 样片源码
+`examples/films/morph-nova/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

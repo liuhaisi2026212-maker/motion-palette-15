@@ -64,3 +64,6 @@ Canvas 2D 完全够（辉光用 `shadowBlur`）。强模型可以用 Three.js �
 
 ## 配乐
 Synthwave：门限混响军鼓、锯齿波琶音贝斯、厚 pad；铬金字砸下时一个大和弦 + 镲。
+
+## 样片源码
+`examples/films/synthwave-深夜电台/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

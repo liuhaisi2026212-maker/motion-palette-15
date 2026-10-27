@@ -22,14 +22,26 @@
 
 字体都是可商用开源字体（OFL），授权文件在 `assets/fonts/`。
 
-## 完整短片（`films/`）
+## 完整短片（`films/`）：15 种风格各一支
 
-对照原版风格做的三支样片源码，每支一个 `film.js`（拷进一份 `starter/` 替换同名文件就能预览、导出）：
+对照原版风格语法、内容全部原创的样片源码。每支一个 `film.js`（+ `film.html`），拷进一份 `starter/` 替换同名文件就能预览、导出。
 
-| 文件夹 | 风格卡 | 看点 |
-|---|---|---|
-| `films/hud-寻猫雷达/` | `hud.md` | 满屏版式（外框顶栏、左右编号面板、罗盘瞄准镜套地图）、锁定戏、Canvas 辉光和故障 |
-| `films/bauhaus-形意周/` | `bauhaus.md` | 出血大几何、印刷外框、每拍一动、图案爆发、竖排品牌名 |
-| `films/variety-周一早上/` | `variety-captions.md` | 贴纸化主体（白边 + 撕纸）、栏目牌、名牌、警示条、仪表、相框卡 + 印章 |
+| 文件夹 | 风格卡 | 主题 | 看点 |
+|---|---|---|---|
+| `films/flat-vector-早一点/` | flat-vector | 早起十分钟 | 完整场景插画、橙点贯穿当转场、2×2 分屏 |
+| `films/line-art-山间茶事/` | line-art | 茶 | 一根线不断（自己写的曲线采样）、笔头发光、圆形标志 |
+| `films/isometric-一亩田/` | isometric | 农场数据 | 等轴沙盘、白模长出来再从中心染色、数据卡引线、拉远出立体字 |
+| `films/3d-render-泡芙工作室/` | 3d-render | 软糖品牌 | Three.js：管子拼的充气字、满地圆珠波纹、软阴影（CDN 加载） |
+| `films/cel-boil-米米手作/` | cel-boil | 饭团手作 | 每 2 帧抖动、扇贝边标牌、字一个个写出、红笔批注 |
+| `films/collage-漫游周刊/` | collage | 旅行杂志 | 代码画相机再转网点剪报、沿虚线剪开、CC0 素材拼贴、撕纸转场 |
+| `films/liquid-啵啵果饮/` | liquid | 果饮 | 元球场 + 用梯度当法线打光、果冻字、地面倒影 |
+| `films/morph-nova/` | morph | 极简品牌 | 所有零件 = 粗描边中心线，逐点插值形变、拖影、彩色轨道 |
+| `films/synthwave-深夜电台/` | synthwave | 电台 | VHS 外壳、条纹落日、霓虹网格、铬金属字 + 霓虹签名 |
+| `films/aurora-glass-Muse/` | aurora-glass | AI 笔记 App | 真界面玻璃卡、景深分层、液态玻璃胶囊放大 |
+| `films/sticker-explainer-奶茶多少糖/` | sticker-explainer | 科普 | 超粗标题 + 红底线、贴纸、镜头平移、画中画结论页 |
+| `films/pixel-厨房闯关记/` | pixel | 学做饭 | 只写镜头表，用 `kits/pixel` 零件库渲染（`index.html` 直接打开） |
+| `films/hud-寻猫雷达/` | hud | 找猫 | 满屏 HUD 版式、锁定戏、辉光故障 |
+| `films/bauhaus-形意周/` | bauhaus | 设计周 | 出血大几何、印刷外框、图案爆发 |
+| `films/variety-周一早上/` | variety-captions | 打工人 | 贴纸主体、栏目牌、名牌、仪表、相框 + 印章 |
 
-`variety-周一早上` 用了两款开源字体：把 `examples/assets/fonts/` 里的 `ZCOOLKuaiLe-Regular.ttf`、`LXGWMarkerGothic-Regular.ttf` 拷进 `starter/fonts/`。
+用到开源字体的几支（cel-boil、variety）：把 `examples/assets/fonts/` 里的 `ZCOOLKuaiLe-Regular.ttf`、`LXGWMarkerGothic-Regular.ttf` 拷进 `starter/fonts/`。拼贴那支要连 `assets/` 一起拷。

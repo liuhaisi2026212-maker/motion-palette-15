@@ -71,3 +71,6 @@ function glassCard(ctx, x, y, w, h, r = 32) {
 
 ## 参考
 `examples/` 暂无完整玻璃例子，按上面的最小可行做法写即可。
+
+## 样片源码
+`examples/films/aurora-glass-Muse/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

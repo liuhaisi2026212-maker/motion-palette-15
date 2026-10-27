@@ -68,3 +68,6 @@ float smin(float a, float b, float k) { float h = clamp(.5 + .5 * (b - a) / k, 0
 
 ## 配乐
 咕嘟声、倒水声、水花、滴答；底下一层低频合成器铺底。
+
+## 样片源码
+`examples/films/liquid-啵啵果饮/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

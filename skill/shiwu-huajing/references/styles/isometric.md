@@ -73,3 +73,6 @@ function box(ctx, x, y, w, d, h, color) {
 
 ## 配乐
 明亮的科技感拨弦 / 马林巴，每块地、每栋楼落地配一个轻 click / pop，拉远时一个空气感 whoosh。
+
+## 样片源码
+`examples/films/isometric-一亩田/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

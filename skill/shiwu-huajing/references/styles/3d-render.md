@@ -59,3 +59,6 @@ function contactShadow(ctx, x, groundY, r, height) { ctx.save(); ctx.filter = `b
 
 ## 配乐
 ASMR 式的满足感音效：软软的咚、挤压声、气泡 pop；空气感的电影 pad 铺底。
+
+## 样片源码
+`examples/films/3d-render-泡芙工作室/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

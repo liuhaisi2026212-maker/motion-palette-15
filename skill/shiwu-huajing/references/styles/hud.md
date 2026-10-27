@@ -103,3 +103,6 @@ ctx.globalCompositeOperation = 'lighter'; ctx.filter = 'blur(8px)'; ctx.globalAl
 
 ## 配乐
 低频锯齿波持续音 + 正弦低音垫底；2.4 秒起 120 BPM 底鼓；日志短哔、雷达光点叮、候选比对的提示音、锁定的重击 + 双音警报、上传上行琶音、关机下滑音。
+
+## 样片源码
+`examples/films/hud-寻猫雷达/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

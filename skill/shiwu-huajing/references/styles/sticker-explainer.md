@@ -63,3 +63,6 @@ const shown = t < tEnd ? Math.round(target * E.outCubic(seg(t, t0, tEnd))) : tar
 
 ## 配乐
 干净的科技解说垫乐；UI 点击声、数字滚动的滴答声、镜头移动时轻微 whoosh。
+
+## 样片源码
+`examples/films/sticker-explainer-奶茶多少糖/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

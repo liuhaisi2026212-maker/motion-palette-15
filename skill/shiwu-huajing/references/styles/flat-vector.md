@@ -71,3 +71,6 @@ ctx.save(); ctx.translate(cx, cy); ctx.rotate(.12 + k * .6); rrect(ctx, -R / 2, 
 
 ## 参考作品
 `examples/kits/flat/`：9 种镜头的完整写法（标题、金句、图标、对比、清单、步骤、大数字、引用、结尾关注）和 22 个扁平图标的画法。
+
+## 样片源码
+`examples/films/flat-vector-早一点/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。

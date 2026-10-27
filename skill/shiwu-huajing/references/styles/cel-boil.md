@@ -77,3 +77,6 @@ function boilStroke(ctx, pts, boil, amp = 2.2, width = 6, color = '#1B1714') {
 
 ## 参考
 `examples/` 里没有完整的手绘例子；可以看 `starter/lib/draw.js` 的 `grain`、`rng` 配合上面的代码写。
+
+## 样片源码
+`examples/films/cel-boil-米米手作/film.js`：按这张卡做的一支完整短片（内容原创），可以对照着看手法。
