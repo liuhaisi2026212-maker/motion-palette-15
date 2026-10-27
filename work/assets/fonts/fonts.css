@@ -1,0 +1,312 @@
+/* Font faces the 15 films load (pages served from the repo root). The font files are not in the repo:
+   put each file at the path in its url(); assets/fonts/README.md lists them. */
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: local('PingFang SC'), local('PingFangSC-Regular'), local('Microsoft YaHei'), local('Noto Sans CJK SC'), local('Source Han Sans SC');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: local('PingFang SC'), local('PingFangSC-Regular'), local('Microsoft YaHei'), local('Noto Sans CJK SC'), local('Source Han Sans SC');
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Alimama ShuHeiTi';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Douyin Sans';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Fusion Pixel 12';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: local('PingFang SC'), local('PingFangSC-Regular'), local('Microsoft YaHei'), local('Noto Sans CJK SC'), local('Source Han Sans SC');
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: local('PingFang SC'), local('PingFangSC-Regular'), local('Microsoft YaHei'), local('Noto Sans CJK SC'), local('Source Han Sans SC');
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: local('PingFang SC'), local('PingFangSC-Regular'), local('Microsoft YaHei'), local('Noto Sans CJK SC'), local('Source Han Sans SC');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Long Cang';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'LXGW Marker Gothic';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Resource Han Rounded';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Resource Han Rounded';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'ZCOOL KuaiLe';
+  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Anton';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Archivo';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 100 900;
+  font-style: italic;
+  font-stretch: 62% 125%;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Bebas Neue';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Caveat';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Chakra Petch';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'DM Sans';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Fredoka';
+  src: url('/assets/fonts/latin/fredoka/Fredoka-VF.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+  font-stretch: 75% 125%;
+  font-display: block;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 1 1000;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/latin/inter/Inter-VF.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Luckiest Guy';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Michroma';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Poppins';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('/assets/fonts/latin/pressstart2p/PressStart2P-Regular.ttf') format('truetype');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Rajdhani';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Rajdhani';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Sora';
+  src: url('/assets/fonts/latin/sora/Sora-VF.ttf') format('truetype');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Unbounded';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'VT323';
+  src: local('Helvetica Neue'), local('Arial');
+  font-weight: 1 1000;
+  font-style: normal;
+  font-display: block;
+}
