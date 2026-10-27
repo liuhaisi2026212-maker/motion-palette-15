@@ -98,7 +98,7 @@ let cur = null, cfg = {}, T = 0, DUR = 10, FPS = 30, VW = 1920, VH = 1080, playi
 
 // ---------- 风格列表
 STYLES.forEach(s => { const b = document.createElement('button'); b.className = 'sty'; b.disabled = !s.ready; b.dataset.id = s.id;
-  b.innerHTML = `<img src="covers/${s.id}.jpg" alt=""><span><b>${s.name}</b><small>${s.ready ? s.work : '制作中'}</small></span>`;
+  b.innerHTML = `<img src="covers/${s.id}.jpg" alt=""><span><b>${s.name}</b><small>${s.ready ? s.work : (s.note || '制作中')}</small></span>`;
   b.onclick = () => pick(s.id); $('styles').appendChild(b); });
 const fit = () => { const k = stage.clientWidth / VW; film.style.transform = `scale(${k})`; };
 new ResizeObserver(fit).observe(stage);
@@ -139,7 +139,7 @@ function buildForm() {
     const d = document.createElement('div'); d.className = 'f';
     if (f.type === 'color') { d.innerHTML = `<label>${f.label}</label><input type="color" data-k="${f.key}">`; colors.appendChild(d); continue; }
     let inner = '';
-    if (f.type === 'text') inner = `<input type="text" data-k="${f.key}" maxlength="${f.max * 2}">`;
+    if (f.type === 'text') inner = `<input type="text" data-k="${f.key}" maxlength="${f.max * 2}" placeholder="不填就用原片的">`;
     else if (f.type === 'list') inner = `<div class="multi">${Array.from({ length: f.n }, (_, i) => `<input type="text" data-k="${f.key}" data-i="${i}">`).join('')}</div>`;
     else if (f.type === 'pairs') inner = `<div class="multi">${Array.from({ length: f.n }, (_, i) => `<input type="text" data-k="${f.key}" data-i="${i}" data-j="0" placeholder="英文"><input type="text" data-k="${f.key}" data-i="${i}" data-j="1" placeholder="汉字">`).join('')}</div>`;
     else if (f.type === 'cards') inner = Array.from({ length: f.n }, (_, i) => `<div class="multi" style="margin-bottom:6px">${['中文名', '英文名', '数字', '单位'].map((ph, j) => `<input type="text" data-k="${f.key}" data-i="${i}" data-j="${j}" placeholder="${ph}">`).join('')}</div>`).join('');

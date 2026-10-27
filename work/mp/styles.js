@@ -30,7 +30,7 @@ export const STYLES = [
       { key: 'callouts', label: '三张数据卡片', type: 'cards', n: 3, tip: '每张：中文名（4 字内）、英文名、数字、单位' },
     ],
     example: { title: 'LIUYE', tagline: '让灵感自己生长', mono: 'LIUYE OS · 365 IDEAS · ONLINE', callouts: [['选题命中', 'HIT RATE', 87.5, '%'], ['日更天数', 'STREAK', 120, '天'], ['粉丝增长', 'GROWTH', 3.6, '万']] } },
-  { id: '04-3d-render', name: '3D 渲染', en: '3D Render', work: 'soft.「柔软着陆」' },
+  { id: '04-3d-render', name: '3D 渲染', en: '3D Render', work: 'soft.「柔软着陆」', note: '暂不支持（要 Blender 重新渲染）' },
   { id: '05-cel-boil', name: '逐帧手绘', en: 'Frame-by-Frame', work: '手作 HAND MADE', ready: true,
     about: '手绘逐帧动画、线条一直在轻轻抖：火柴划着，跳出一个小火苗精灵，炸成烟花，再按真实笔顺写出大标题，最后拉远成一叠原画纸。适合有温度的品牌、手作、文创、知识栏目。',
     fields: [
