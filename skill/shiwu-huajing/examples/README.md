@@ -21,3 +21,15 @@
 - 用户的片子请在 `starter/` 里按用户的主题从头写，需要某个画法时再来这里翻。
 
 字体都是可商用开源字体（OFL），授权文件在 `assets/fonts/`。
+
+## 完整短片（`films/`）
+
+对照原版风格做的三支样片源码，每支一个 `film.js`（拷进一份 `starter/` 替换同名文件就能预览、导出）：
+
+| 文件夹 | 风格卡 | 看点 |
+|---|---|---|
+| `films/hud-寻猫雷达/` | `hud.md` | 满屏版式（外框顶栏、左右编号面板、罗盘瞄准镜套地图）、锁定戏、Canvas 辉光和故障 |
+| `films/bauhaus-形意周/` | `bauhaus.md` | 出血大几何、印刷外框、每拍一动、图案爆发、竖排品牌名 |
+| `films/variety-周一早上/` | `variety-captions.md` | 贴纸化主体（白边 + 撕纸）、栏目牌、名牌、警示条、仪表、相框卡 + 印章 |
+
+`variety-周一早上` 用了两款开源字体：把 `examples/assets/fonts/` 里的 `ZCOOLKuaiLe-Regular.ttf`、`LXGWMarkerGothic-Regular.ttf` 拷进 `starter/fonts/`。
