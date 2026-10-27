@@ -14,7 +14,17 @@ const V5 = Q.get('v5') === '1';
 const NOLINK = new Set(V5 ? (Q.get('nolink') || '').split(',').map((s) => s.trim()).filter(Boolean) : []);
 const HIDE_DOT = NOLINK.has('dot'), HIDE_TITLE = NOLINK.has('title');
 // v5.2 (jury round 6): title contrast pass (deep pool + halo behind the glass title, brighter glass, clearer line 2). ?v52=0 = v5.1 look
-const V52 = V5 && Q.get('v52') !== '0';
+// ---- 十五画境：可改配置 ----
+const { loadCfg } = await import('/mp/cfg.js');
+const UI_EN = { name: 'Aurora', now: 'now', thinking: 'thinking', ask: 'Plan a slow Sunday for me.',
+    reply: ['Slow breakfast at ten.', 'The lake path at four,', 'when the light turns gold.', 'I’ve cleared the rest.'],
+    chips: ['Add to calendar', 'Remind me at 3:30'], listening: 'Listening', caption: '“…keep tonight free”',
+    focus: 'Focus', focusSub: 'Only family can reach you', glow: 'Glow' };
+const CFG = loadCfg({ brand: 'Aurora', tagline: 'Think in light.', taglineCn: '思考，自有光', ui: UI_EN,
+  base: '#040312', violet: '#7050FF', blue: '#2F46F2', cyan: '#34CFF0', magenta: '#B653F0', indigo: '#3320A8', periwinkle: '#8C8CFF' });
+// 中文品牌名走原片 v5 的「玻璃字 + 句号镜头」排法（只借用标题部分，不改时间）
+const TV5 = V5 || /[\u3400-\u9fff]/.test(CFG.brand);
+const V52 = TV5 && Q.get('v52') !== '0';
 
 const cues = await (await fetch('/demos/12-aurora-glass/cues.json')).json();
 let ENV = null;
@@ -115,7 +125,7 @@ function project(P, O) { const dz = P[2] - O[2]; return [960 + F * (P[0] - O[0])
 // ------------------------------------------------------------------ palette
 const hex = (h) => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255];
 const PAL = {
-  base: '#040312', violet: '#7050FF', blue: '#2F46F2', cyan: '#34CFF0', magenta: '#B653F0', indigo: '#3320A8', periwinkle: '#8C8CFF',
+  base: CFG.base, violet: CFG.violet, blue: CFG.blue, cyan: CFG.cyan, magenta: CFG.magenta, indigo: CFG.indigo, periwinkle: CFG.periwinkle,
 };
 
 // ------------------------------------------------------------------ aurora blobs: slow bezier drifts (20–40 s loops, we see a slice)
@@ -140,7 +150,7 @@ const BLOBS = [
   { col: PAL.blue, rx: 500, ry: 250, ang: -8, i: 0.95, path: loopBezier([[820, 880], [560, 800], [700, 980], [1060, 920]], 36, 0.5) },
   { col: PAL.indigo, rx: 560, ry: 380, ang: 0, i: 0.32, path: loopBezier([[1020, 540], [1160, 470], [1080, 640], [880, 600]], 40, 0.3) },
   { col: PAL.periwinkle, rx: 240, ry: 170, ang: 10, i: 0.45, path: loopBezier([[1180, 420], [1060, 520], [900, 560], [1120, 360]], 24, 0.1) },
-  { col: '#3036D8', rx: 460, ry: 210, ang: -6, i: 0.55, path: loopBezier([[1180, 1090], [1320, 1040], [1060, 1010], [980, 1080]], 32, 0.2) },
+  { col: CFG.blue === '#2F46F2' ? '#3036D8' : CFG.blue, rx: 460, ry: 210, ang: -6, i: 0.55, path: loopBezier([[1180, 1090], [1320, 1040], [1060, 1010], [980, 1080]], 32, 0.2) },
 ];
 const NB = BLOBS.length;
 // ------------------------------------------------------------------ WebGL setup
@@ -162,7 +172,7 @@ function compile(fs) {
   return { p, loc };
 }
 const P = { aurora: compile(FS_AURORA), down: compile(FS_DOWN), blur: compile(FS_BLUR), card: compile(FS_CARD), over: compile(FS_OVER), lens: compile(FS_LENS), final: compile(FS_FINAL) };
-if (V5) P.glyph = compile(FS_GLYPH);   // v5.1: frosted-glass letterforms
+if (TV5) P.glyph = compile(FS_GLYPH);   // v5.1: frosted-glass letterforms
 const vao = gl.createVertexArray();
 
 function makeTarget(w, h, fmt = IFMT, type = TYPE) {
@@ -175,7 +185,7 @@ function makeTarget(w, h, fmt = IFMT, type = TYPE) {
   return { tex, fb, w, h };
 }
 const T = { sceneA: makeTarget(RW, RH), sceneB: makeTarget(RW, RH), lens: makeTarget(RW, RH), q1: makeTarget(QW, QH), q2: makeTarget(QW, QH), qL: makeTarget(QW, QH), qB: makeTarget(QW, QH) };
-if (V5) { T.g1 = makeTarget(RW, RH); T.g2 = makeTarget(RW, RH); }   // v5.1: bevel blur of the glass glyph mask
+if (TV5) { T.g1 = makeTarget(RW, RH); T.g2 = makeTarget(RW, RH); }   // v5.1: bevel blur of the glass glyph mask
 
 function canvasTex(mip) {
   const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -202,17 +212,20 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParame
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
 
 // fonts
-const FONT_UI = V5 ? "'Inter', 'HarmonyOS Sans SC'" : "'Inter'", FONT_WORD = "'Sora'", FONT_CN = "'HarmonyOS Sans SC'";
+const FONT_UI = "'Inter', 'HarmonyOS Sans SC'", FONT_WORD = "'Sora'", FONT_CN = "'HarmonyOS Sans SC'";
 // v5 copy: Chinese UI micro-copy + the title lockup
 // v5.1: the title is HarmonyOS Black (900) rendered as frosted glass (FS_GLYPH); line 2 is HarmonyOS Medium
-const V5T = { title: '玻璃拟态', sub: '弥散渐变', en: 'AURORA · GLASS', size: 216, track: 10, base: 580, w: 900, subSize: 54, subW: 500, subBase: 704, enSize: 32, enTrack: 6 };
-const UI = V5 ? {
+const V5N = V5 ? 4 : [...CFG.brand].length;
+const V5T = V5 ? { title: '玻璃拟态', sub: '弥散渐变', en: 'AURORA · GLASS', size: 216, track: 10, base: 580, w: 900, subSize: 54, subW: 500, subBase: 704, enSize: 32, enTrack: 6 }
+  : { title: CFG.brand, sub: CFG.taglineCn, en: CFG.tagline, size: Math.round(Math.min(216, 1000 / Math.max(1, V5N))), track: 10, base: 580, w: 900, subSize: 54, subW: 500, subBase: 704, enSize: 32, enTrack: 6 };
+const UI_V5 = {
   name: '极光', now: '刚刚', thinking: '思考中', ask: '帮我安排一个慢悠悠的周日。',
   reply: ['十点，慢慢吃早餐。', '四点，去湖边走一走，', '正好赶上光变成金色。', '其余的，我都替你推掉了。'],
   chips: ['加入日历', '3:30 提醒我'], listening: '聆听中', caption: '“……今晚留给家人”',
   focus: '专注', focusSub: '仅家人可以联系你', glow: '光晕',
-} : null;
-if (V5) {
+};
+const UI = V5 ? UI_V5 : Object.assign({}, UI_EN, CFG.ui);
+if (TV5 || /[\u3400-\u9fff]/.test(JSON.stringify(UI))) {
   const cjk = V5T.title + '。' + V5T.sub + UI.name + UI.now + UI.thinking + UI.ask + UI.reply.join('') + UI.chips.join('') + UI.listening + UI.caption + UI.focus + UI.focusSub + UI.glow;
   await Promise.all([300, 400, 500, 700].map((w) => document.fonts.load(`${w} 200px ${FONT_CN}`, cjk)).concat(
     [document.fonts.load(`300 28px ${FONT_WORD}`, V5T.en), document.fonts.load(`${V5T.w} ${V5T.size}px ${FONT_CN}`, V5T.title + '。'),
@@ -220,8 +233,8 @@ if (V5) {
 }
 await Promise.all([
   document.fonts.load(`400 24px ${FONT_UI}`, 'Aa'), document.fonts.load(`500 24px ${FONT_UI}`, 'Aa'), document.fonts.load(`600 24px ${FONT_UI}`, 'Aa'),
-  document.fonts.load(`200 150px ${FONT_WORD}`, 'Aurora'), document.fonts.load(`300 30px ${FONT_WORD}`, 'Think in light.'),
-  document.fonts.load(`300 26px ${FONT_CN}`, '思考，自有光'),
+  document.fonts.load(`200 150px ${FONT_WORD}`, CFG.brand), document.fonts.load(`300 30px ${FONT_WORD}`, CFG.tagline),
+  document.fonts.load(`300 26px ${FONT_CN}`, CFG.taglineCn),
 ]);
 await document.fonts.ready;
 
@@ -280,7 +293,7 @@ function makeCard(def) {
 }
 
 // A — conversation
-const REPLY = V5 ? UI.reply : ['Slow breakfast at ten.', 'The lake path at four,', 'when the light turns gold.', 'I’ve cleared the rest.'];
+const REPLY = UI.reply ||  ['Slow breakfast at ten.', 'The lake path at four,', 'when the light turns gold.', 'I’ve cleared the rest.'];
 function drawChat(c, t) {
   const g = c.g; g.setTransform(S, 0, 0, S, 0, 0); g.clearRect(0, 0, c.w, c.h);
   g.textBaseline = 'alphabetic';
@@ -289,16 +302,16 @@ function drawChat(c, t) {
   const hA = riseA(t, cues.cardA_in + 0.35, 0.9);
   g.globalAlpha = hA.a;
   orbIcon(g, P0 + 16, P0 + 16 + hA.dy, 16, t);
-  font(g, 600, 20); g.fillStyle = WHITE(0.95); g.letterSpacing = '0px'; g.fillText(V5 ? UI.name : 'Aurora', P0 + 44, P0 + 23 + hA.dy);
+  font(g, 600, 20); g.fillStyle = WHITE(0.95); g.letterSpacing = '0px'; g.fillText(UI.name, P0 + 44, P0 + 23 + hA.dy);
   const thinking = inv(cues.typing - 0.1, cues.typing + 0.15, t) * (1 - inv(cues.reply[0] - 0.05, cues.reply[0] + 0.35, t));
   font(g, 400, 16); g.fillStyle = WHITE(0.5); g.textAlign = 'right';
-  g.globalAlpha = hA.a * (1 - thinking); g.fillText(V5 ? UI.now : 'now', c.w - P0, P0 + 22 + hA.dy);
-  g.globalAlpha = hA.a * thinking; g.fillText(V5 ? UI.thinking : 'thinking', c.w - P0, P0 + 22 + hA.dy);
+  g.globalAlpha = hA.a * (1 - thinking); g.fillText(UI.now, c.w - P0, P0 + 22 + hA.dy);
+  g.globalAlpha = hA.a * thinking; g.fillText(UI.thinking, c.w - P0, P0 + 22 + hA.dy);
   g.textAlign = 'left'; g.globalAlpha = 1;
   // user bubble (right aligned)
   const ub = riseA(t, cues.user_bubble - 0.25, 0.7); // r1s2: in medias res - the bubble is already landing on frame 0 (pop at 0.03)
   if (ub.a > 0) {
-    font(g, 400, 21); const txt = V5 ? UI.ask : 'Plan a slow Sunday for me.'; const tw = g.measureText(txt).width;
+    font(g, 400, 21); const txt = UI.ask; const tw = g.measureText(txt).width;
     const bw = tw + 44, bh = 50, bx = c.w - P0 - bw, by = 100 + ub.dy;
     g.globalAlpha = ub.a;
     rr(g, bx, by, bw, bh, 25); g.fillStyle = WHITE(0.16); g.fill(); g.strokeStyle = WHITE(0.22); g.lineWidth = 1; g.stroke();
@@ -330,7 +343,7 @@ function drawChat(c, t) {
   // action chips
   font(g, 500, 16);
   let cx = P0 + 48;   // r2: clear of card C's rim
-  (V5 ? UI.chips : ['Add to calendar', 'Remind me at 3:30']).forEach((txt, i) => {
+  UI.chips.forEach((txt, i) => {
     const r = riseA(t, cues.chips + i * 0.12, 0.75);
     const tw = g.measureText(txt).width, bw = tw + 36;
     if (r.a > 0) {
@@ -354,9 +367,9 @@ function drawVoice(c, t) {
   const hA = riseA(t, cues.cardB_in + 0.35, 0.9);
   g.globalAlpha = hA.a;
   // r2: label + timer (small), the live orb is now the waveform's source
-  font(g, 500, 19); g.fillStyle = WHITE(0.95); g.fillText(V5 ? UI.listening : 'Listening', P0, P0 + 18 + hA.dy);
+  font(g, 500, 19); g.fillStyle = WHITE(0.95); g.fillText(UI.listening, P0, P0 + 18 + hA.dy);
   const secs = Math.max(0, Math.floor(t - cues.voice_on + 3));
-  const lw = g.measureText(V5 ? UI.listening : 'Listening').width; font(g, 400, 17); g.fillStyle = WHITE(0.5);
+  const lw = g.measureText(UI.listening).width; font(g, 400, 17); g.fillStyle = WHITE(0.5);
   g.fillText(`0:${String(secs).padStart(2, '0')}`, P0 + lw + 12, P0 + 18 + hA.dy);
   g.globalAlpha = 1;
   // waveform radiating from the orb (newest at the orb), driven by the soundtrack envelope.
@@ -384,7 +397,7 @@ function drawVoice(c, t) {
   g.globalAlpha = on; g.fillStyle = core; g.beginPath(); g.arc(OX, cy, pr, 0, TAU); g.fill(); g.globalAlpha = 1;
   // caption: short enough to stay left of A
   const cap = riseA(t, cues.voice_on + 0.9, 0.8);
-  g.globalAlpha = cap.a * 0.6; font(g, 400, 15); g.fillStyle = WHITE(1); g.fillText(V5 ? UI.caption : '“…keep tonight free”', P0, c.h - P0 + 2 + cap.dy);
+  g.globalAlpha = cap.a * 0.6; font(g, 400, 15); g.fillStyle = WHITE(1); g.fillText(UI.caption, P0, c.h - P0 + 2 + cap.dy);
   g.globalAlpha = 1;
 }
 
@@ -413,8 +426,8 @@ function drawModes(c, t) {
   // moon icon
   g.save(); g.translate(P0 + 14, y1); g.fillStyle = WHITE(0.92);
   g.beginPath(); g.arc(0, 0, 12, 0, TAU); g.arc(6, -5, 10, 0, TAU, true); g.fill('evenodd'); g.restore();
-  font(g, 500, 21); g.fillStyle = WHITE(0.95); g.fillText(V5 ? UI.focus : 'Focus', P0 + 42, y1 - 2);
-  font(g, 400, 15); g.fillStyle = WHITE(0.5); g.fillText(V5 ? UI.focusSub : 'Only family can reach you', P0 + 42, y1 + 20);
+  font(g, 500, 21); g.fillStyle = WHITE(0.95); g.fillText(UI.focus, P0 + 42, y1 - 2);
+  font(g, 400, 15); g.fillStyle = WHITE(0.5); g.fillText(UI.focusSub, P0 + 42, y1 + 20);
   // toggle
   const p = toggleP(t);
   const tx = TOG.x, ty = TOG.y + hA.dy;
@@ -441,7 +454,7 @@ function drawModes(c, t) {
   g.beginPath(); g.arc(0, 0, 6, 0, TAU); g.stroke();
   for (let i = 0; i < 8; i++) { const a = i * TAU / 8; g.beginPath(); g.moveTo(Math.cos(a) * 10, Math.sin(a) * 10); g.lineTo(Math.cos(a) * 13, Math.sin(a) * 13); g.stroke(); }
   g.restore();
-  font(g, 500, 21); g.fillStyle = WHITE(0.95); g.fillText(V5 ? UI.glow : 'Glow', P0 + 42, y2);
+  font(g, 500, 21); g.fillStyle = WHITE(0.95); g.fillText(UI.glow, P0 + 42, y2);
   const sx0 = 190, sx1 = c.w - P0, sy = y2 - 7;
   const v = lerp(0.3, 0.74, eInOutCubic(inv(cues.slider[0], cues.slider[1], t)));
   rr(g, sx0, sy - 2, sx1 - sx0, 4, 2); g.fillStyle = WHITE(0.18); g.fill();
@@ -523,25 +536,26 @@ function cardLocalScreen(ci, t, lx, ly) {
 function knobScreen(t) { const [lx, ly] = knobLocal(t); return cardLocalScreen(2, t, lx, ly); }
 
 // ------------------------------------------------------------------ wordmark metrics (the lens becomes its "o")
-const WORD = 'Aurora';
+const WORD = TV5 ? 'Aurora' : CFG.brand;
+const OI = (() => { const i = WORD.search(/[oO0]/); return i; })();   // 玻璃镜头变成哪个字母；没有 o 就挂在词尾当句号
 const wordCv = document.createElement('canvas'); wordCv.width = RW; wordCv.height = RH;
 const wg = wordCv.getContext('2d');
 const wordTex = canvasTex(false);
 // v5.1: the four title glyphs go to their own mask canvas (premultiplied white, g = wave catch); FS_GLYPH turns them to glass
-const glyphCv = V5 ? document.createElement('canvas') : null, gg = V5 ? glyphCv.getContext('2d') : null, glyphTex = V5 ? canvasTex(false) : null;
-if (V5) { glyphCv.width = RW; glyphCv.height = RH; }
-const WORD_SIZE = 178, WORD_BASE = 596, WORD_TRACK = 4;
+const glyphCv = TV5 ? document.createElement('canvas') : null, gg = TV5 ? glyphCv.getContext('2d') : null, glyphTex = TV5 ? canvasTex(false) : null;
+if (TV5) { glyphCv.width = RW; glyphCv.height = RH; }
+const WORD_SIZE = Math.round(Math.min(178, 1300 / Math.max(3, WORD.length) * 1.55)), WORD_BASE = 596, WORD_TRACK = 4;
 wg.font = `200 ${WORD_SIZE}px ${FONT_WORD}`; wg.letterSpacing = `${WORD_TRACK}px`;
 const wordW = wg.measureText(WORD).width - WORD_TRACK;
-const WX0 = 960 - wordW / 2;
+const WX0 = 960 - wordW / 2 - (OI < 0 ? WORD_SIZE * .2 : 0);
 // optical kerning: close the open A-u diagonal, give the (rounder, larger) glass "o" room before "ra"; recentred
-const KERN = [8, 0, 0, 0, 6, 6];
-const LETTER_X = [...WORD].map((_, i) => WX0 + wg.measureText(WORD.slice(0, i)).width + KERN[i] - (KERN[0] + KERN[5]) / 2);
+const KERN = WORD === 'Aurora' ? [8, 0, 0, 0, 6, 6] : [...WORD].map((_, i) => OI >= 0 && i > OI ? 6 : 0);
+const LETTER_X = [...WORD].map((_, i) => WX0 + wg.measureText(WORD.slice(0, i)).width + KERN[i] - (KERN[0] + KERN[KERN.length - 1]) / 2);
 wg.letterSpacing = '0px';
 const oM = wg.measureText('o');
 // v5: 「玻璃拟态。」 — HarmonyOS Sans SC Light, the four glyphs centred (the 句号 hangs, 标点悬挂); the glass ring is the 句号
 const V5L = (() => {
-  if (!V5) return null;
+  if (!TV5) return null;
   wg.font = `${V5T.w} ${V5T.size}px ${FONT_CN}`;
   const ch = [...V5T.title], adv = ch.map((c) => wg.measureText(c).width);
   const total = adv.reduce((a, b) => a + b, 0) + V5T.track * (ch.length - 1);
@@ -555,18 +569,20 @@ const V5L = (() => {
   wg.font = `200 ${WORD_SIZE}px ${FONT_WORD}`;
   return { ch, adv, xs, ink, total, R, cx, cy };
 })();
-const O_CX = V5 ? V5L.cx : LETTER_X[3] + (oM.actualBoundingBoxRight - oM.actualBoundingBoxLeft) / 2 + (-oM.actualBoundingBoxLeft);
-const O_CY = V5 ? V5L.cy : WORD_BASE - (oM.actualBoundingBoxAscent - oM.actualBoundingBoxDescent) / 2;
-const O_R = V5 ? V5L.R : (oM.actualBoundingBoxAscent + oM.actualBoundingBoxDescent) / 2 + 1.5;
+const O_CX = TV5 ? V5L.cx : OI >= 0 ? LETTER_X[OI] + (oM.actualBoundingBoxRight - oM.actualBoundingBoxLeft) / 2 + (-oM.actualBoundingBoxLeft)
+  : LETTER_X[WORD.length - 1] + wg.measureText(WORD.slice(-1)).width + (oM.actualBoundingBoxAscent + oM.actualBoundingBoxDescent) * .42;
+const O_CY = TV5 ? V5L.cy : OI < 0 ? WORD_BASE - (oM.actualBoundingBoxAscent + oM.actualBoundingBoxDescent) * .28 : WORD_BASE - (oM.actualBoundingBoxAscent - oM.actualBoundingBoxDescent) / 2;
+const O_R = TV5 ? V5L.R : (oM.actualBoundingBoxAscent + oM.actualBoundingBoxDescent) / (OI < 0 ? 3.4 : 2) + 1.5;
 // letters ripple outward from the glass "o"
 // r2: when the 9.0 refraction wave (r = 700 * outSine(k), 0.9 s) reaches each letter's centre
 const LETTER_CATCH = [...WORD].map((ch, i) => { const w = wg.measureText(ch).width; const d = Math.hypot(LETTER_X[i] + w / 2 - O_CX, WORD_BASE - 60 - O_CY);
   return cues.wave + 0.9 * Math.asin(Math.min(1, d / 700)) * 2 / Math.PI; });
-const LETTER_T = [0.3, 0.15, 0.0, null, 0.02, 0.17].map((d) => d === null ? null : cues.word + d);
+const LETTER_T = WORD === 'Aurora' ? [0.3, 0.15, 0.0, null, 0.02, 0.17].map((d) => d === null ? null : cues.word + d)
+  : [...WORD].map((_, i) => i === OI ? null : cues.word + Math.min(0.32, 0.08 * Math.abs(i - (OI >= 0 ? OI : WORD.length)) - 0.06 + (i % 2) * 0.02));
 // v5: the four glyphs ripple outward from the centre; each catches the 9.0 wave as it reaches it from the 句号
-const V5_T = V5 ? [0.13, 0.0, 0.02, 0.15].map((d) => cues.word + d) : null;
+const V5_T = TV5 ? (V5 ? [0.13, 0.0, 0.02, 0.15] : V5L.ch.map((_, i) => Math.abs(i - (V5L.ch.length - 1) / 2) * 0.09)).map((d) => cues.word + d) : null;
 const V5_RISE = 0.95, V5_SWEEP = [8.0, 8.8];   // (internal time) glyph rise; specular sweep once pane A has cleared
-const V5_CATCH = V5 ? V5L.xs.map((x, i) => { const d = Math.hypot(x + V5L.adv[i] / 2 - O_CX, (V5L.ink.top + V5L.ink.bot) / 2 - O_CY);
+const V5_CATCH = TV5 ? V5L.xs.map((x, i) => { const d = Math.hypot(x + V5L.adv[i] / 2 - O_CX, (V5L.ink.top + V5L.ink.bot) / 2 - O_CY);
   return cues.wave + 0.9 * Math.asin(Math.min(1, d / 700)) * 2 / Math.PI; }) : null;
 
 // ------------------------------------------------------------------ lens choreography
@@ -654,7 +670,7 @@ function lensState(t) {
   let bezel = Math.min(Math.min(hx, hy) * 0.55, q('bzmax', 60));
   // the drop opens into a ring: an annulus the weight of a Sora stroke (iris opening from the centre)
   const rk = eSine(inv(cues.ring_open[0], cues.ring_open[1], t));
-  const RW_END = q('ringw', V5 ? 14 : 13) * ws;   // v5.1: a heavier 句号 ring to sit with the Black glass glyphs
+  const RW_END = q('ringw', TV5 ? 14 : (OI < 0 ? 10 : 13)) * ws;   // v5.1: a heavier 句号 ring to sit with the Black glass glyphs
   const ringW = rk > 0 ? lerp(Math.min(hx, hy) * 1.1, RW_END, rk) : 0;
   if (ringW > 0) bezel = Math.min(bezel, ringW * 0.5);
   // the light turns gold inside the glass (and a trace of it stays in the counter of the "o")
@@ -674,14 +690,14 @@ function lensState(t) {
 }
 
 // the end card keeps breathing: a very slow push on the lockup (the glass "o" rides the same transform)
-const WC_Y = V5 ? 560 : 590;
+const WC_Y = TV5 ? 560 : 590;
 function wordScale(t) { return 1 + 0.022 * eSine(inv(7.2, 10.4, t)); }
 function drawWord(t) {
   const g = wg; g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H);
   const ws = wordScale(t); g.setTransform(DPR * ws, 0, 0, DPR * ws, DPR * 960 * (1 - ws), DPR * WC_Y * (1 - ws));
   if (t < cues.word - 0.05) return false;
   g.textBaseline = 'alphabetic';
-  if (V5) { gg.setTransform(DPR, 0, 0, DPR, 0, 0); gg.clearRect(0, 0, W, H); gg.setTransform(DPR * ws, 0, 0, DPR * ws, DPR * 960 * (1 - ws), DPR * WC_Y * (1 - ws));
+  if (TV5) { gg.setTransform(DPR, 0, 0, DPR, 0, 0); gg.clearRect(0, 0, W, H); gg.setTransform(DPR * ws, 0, 0, DPR * ws, DPR * 960 * (1 - ws), DPR * WC_Y * (1 - ws));
     drawTitleV5(g, t); return true; }
   g.font = `200 ${WORD_SIZE}px ${FONT_WORD}`; g.letterSpacing = '0px';
   for (let i = 0; i < WORD.length; i++) {
@@ -701,12 +717,12 @@ function drawWord(t) {
     g.globalAlpha = tg.a;
     const y = 684 + tg.dy;
     g.font = `300 29px ${FONT_WORD}`; g.letterSpacing = '0.5px';
-    const en = 'Think in light.'; const ew = g.measureText(en).width;
+    const en = CFG.tagline; const ew = g.measureText(en).width;
     // CJK line set in full cells: the native full-width comma keeps its own em (standard 全角 setting)
     g.font = `300 28px ${FONT_CN}`; g.letterSpacing = '0px';
     const TR = 2.5, adv = (c) => g.measureText(c).width;
     const cn = []; let px = 0;
-    for (const ch of '思考，自有光') { cn.push([ch, px]); px += adv(ch) + TR; }
+    for (const ch of CFG.taglineCn) { cn.push([ch, px]); px += adv(ch) + TR; }
     const cw = px - TR;
     const gap = 28, total = ew + gap * 2 + 1 + cw, x0 = 960 - total / 2;
     g.font = `300 29px ${FONT_WORD}`; g.letterSpacing = '0.5px'; g.fillStyle = WHITE(0.88); g.fillText(en, x0, y);
@@ -755,7 +771,7 @@ function drawTitleV5(g, t) {
   g.globalAlpha = 1; g.letterSpacing = '0px';
 }
 // v5.1: the glass glyph pass (src -> dst). Bevel = narrow full-res blur of the mask; dome + shadow = wide quarter-res blur.
-const TAPS_GN = V5 ? gaussTaps(4.5 * DPR) : null, TAPS_GW = V5 ? gaussTaps(12 * DPR / 4) : null, TAPS_GF = V5 ? gaussTaps(18 * DPR / 4) : null;
+const TAPS_GN = TV5 ? gaussTaps(4.5 * DPR) : null, TAPS_GW = TV5 ? gaussTaps(12 * DPR / 4) : null, TAPS_GF = TV5 ? gaussTaps(18 * DPR / 4) : null;
 function glassGlyphs(t, src, dst) {
   upload(glyphTex, glyphCv, false);
   let L = use(P.blur, T.g1); bindTex(0, glyphTex, L.uSrc); gl.uniform2f(L.uDir, 1, 0); gl.uniform1fv(L.uOff, TAPS_GN.offs); gl.uniform1fv(L.uW, TAPS_GN.ws); gl.uniform1i(L.uN, TAPS_GN.n); draw();
@@ -827,7 +843,7 @@ const renderU = async (t) => {
   let cur = T.sceneA;
   // ---- wordmark + tagline: they live BEHIND the glass, so the parting panes frost them first
   if (!NOUI && drawWord(t)) {
-    if (V5 && GLYPHS_ON) { glassGlyphs(t, cur, T.sceneB); cur = T.sceneB; }   // v5.1: frosted-glass letters
+    if (TV5 && GLYPHS_ON) { glassGlyphs(t, cur, T.sceneB); cur = T.sceneB; }   // v5.1: frosted-glass letters
     upload(wordTex, wordCv, false);
     L = use(P.over, cur); gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     bindTex(0, wordTex, L.uTex); gl.uniform1f(L.uA, 1); draw(); gl.disable(gl.BLEND);

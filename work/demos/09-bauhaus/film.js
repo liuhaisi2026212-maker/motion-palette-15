@@ -12,6 +12,14 @@ const MB = +(Q.get('mb') || window.DEMO.motionBlur.samples);          // harness
 const V5 = Q.get('v5') === '1';
 const NOLINK = new Set(V5 ? (Q.get('nolink') || '').split(',').map(s => s.trim()).filter(Boolean) : []);
 const BASE = '/demos/09-bauhaus/';
+// ---- 十五画境：可改配置 ----
+const { loadCfg } = await import('/mp/cfg.js');
+const CFG = loadCfg({ word: 'BAUHAUS', caption: ['FORM', 'FARBE', 'FUNKTION'], zh: ['形式', '色彩', '功能'],
+  labels: [['GELB', '黄'], ['ROT', '红'], ['BLAU', '蓝']], counter: 'SCHLAG',
+  footer: 'BOGEN 09 — KONSTRUKTION IN 20 SCHLÄGEN · 120 BPM · M = 120 PX', header: 'KINETISCHES PLAKAT · Nº 09 · WEIMAR 1919',
+  paper: '#F1E9DA', yellow: '#F2B705', red: '#E03C31', blue: '#1E4FA3', black: '#111111' });
+CFG.word = String(CFG.word).toUpperCase().replace(/[^A-Z0-9&!?.\-]/g, '').slice(0, 10) || 'BAUHAUS';
+const glv = h => { h = h.replace('#', ''); const n = parseInt(h, 16); return `vec3(${n >> 16 & 255}.,${n >> 8 & 255}.,${n & 255}.)/255.`; };
 const cues = await (await fetch(BASE + 'cues.json')).json();
 const EV = Object.fromEntries(cues.events.map(e => [e.id, e]));
 const RP = Object.fromEntries(cues.ripples.map(r => [r.id, r]));
@@ -63,7 +71,7 @@ function measureType() {
   const capH = a.measureText('H').actualBoundingBoxAscent / 100;
   const size = M / capH;                       // cap height = exactly one module
   a.font = f(size);
-  const word = 'BAUHAUS'.split('');
+  const word = CFG.word.split('');
   const m = word.map(ch => a.measureText(ch));
   const adv = m.map(x => x.width);
   const bbL0 = m[0].actualBoundingBoxLeft, bbRn = m[word.length - 1].actualBoundingBoxRight;
@@ -73,12 +81,12 @@ function measureType() {
   const xs = []; let x = bbL0; for (let i = 0; i < word.length; i++) { xs.push(x); x += adv[i] + track; }
   // caption: German words along the rotated baseline; each Chinese pair is centred on its German word
   a.font = '600 24px "Poppins"'; a.letterSpacing = '7.2px';
-  const cap = ['FORM', ' · ', 'FARBE', ' · ', 'FUNKTION'];
+  const cap = [CFG.caption[0], ' · ', CFG.caption[1], ' · ', CFG.caption[2]];
   let o = 0; const mids = [];
   for (const w of cap) { const wd = a.measureText(w).width; if (w.trim().length > 1) mids.push(o + (wd - 7.2) / 2); o += wd; }
   a.letterSpacing = '0px';
   a.font = '600 13px "Poppins"'; a.letterSpacing = '2.6px';
-  const dw = a.measureText('0').width, lw = a.measureText('SCHLAG ').width;
+  const dw = a.measureText('0').width, lw = a.measureText(CFG.counter + ' ').width;
   a.letterSpacing = '0px';
   TYPE = { size, word, xs, track, mids, dw, lw };
 }
@@ -245,7 +253,7 @@ function drawBack(nLab = 3) {
   cc.strokeStyle = INK.Y[0]; cc.beginPath(); P.poly(tri)(cc); cc.stroke();
   cc.strokeStyle = INK.R[0]; cc.beginPath(); cc.rect(720, 300, 480, 480); cc.stroke();
   if (disc2) { cc.strokeStyle = INK.B[0]; cc.beginPath(); P.circle(1560, 540, 240)(cc); cc.stroke(); }
-  const lab = [['GELB', '黄', 360], ['ROT', '红', 960], ['BLAU', '蓝', 1560]];
+  const lab = [360, 960, 1560].map((x, i) => [CFG.labels[i][0], CFG.labels[i][1], x]);
   for (const [de, zh, x] of lab.slice(0, nLab)) {              // knocked-out labels (paper shows through), stamped on 7.0
     text('P', de, x - 8, 900, '600 24px "Poppins"', 7.2, 'right');
     text('P', zh, x + 16, 901, '700 26px "Noto Sans SC"', 0, 'left');
@@ -257,7 +265,8 @@ function drawType(t) {
   if (!TYPE) return;
   const L = cues.letters;
   const tg = snap(t);
-  const n = Math.min(L.n, Math.floor((tg - L.t0) / L.step + 1e-6) + 1);
+  const NL = TYPE.word.length, stp = L.step * (L.n - 1) / Math.max(1, NL - 1);
+  const n = Math.min(NL, Math.floor((tg - L.t0) / stp + 1e-6) + 1);
   if (tg >= L.t0 && n > 0) {
     for (const [c, col] of [[a, INK.K[0]], [b, INK.K[1]]]) {
       c.save(); c.translate(240, 1020); c.rotate(-Math.PI / 2);
@@ -271,14 +280,14 @@ function drawType(t) {
     for (const [c, k] of [[a, 0], [b, 1]]) {
       c.save(); c.fillStyle = INK.K[k]; c.translate(0, 1020); c.rotate(-Math.PI / 2);
       c.font = `600 24px "Poppins"`; c.letterSpacing = '7.2px'; c.textBaseline = 'alphabetic';
-      c.fillText('FORM · FARBE · FUNKTION', 0, 291);
+      c.fillText(CFG.caption.join(' · '), 0, 291);
       c.letterSpacing = '0px'; c.restore();
     }
     // Chinese upright (竖排), each pair anchored beside its German word: 形式 | FORM, 色彩 | FARBE, 功能 | FUNKTION
-    const zh = [['形', '式'], ['色', '彩'], ['功', '能']];
+    const zh = CFG.zh.map(w => [...String(w)].slice(0, 2));
     zh.forEach((pr, i) => { const yc = 1020 - TYPE.mids[i];
       text('K', pr[0], 324, yc - 3, '700 26px "Noto Sans SC"', 0, 'center', 'alphabetic');
-      text('K', pr[1], 324, yc + 27, '700 26px "Noto Sans SC"', 0, 'center', 'alphabetic'); });
+      if (pr[1]) text('K', pr[1], 324, yc + 27, '700 26px "Noto Sans SC"', 0, 'center', 'alphabetic'); });
     // Kandinsky key ▲ ■ ● (1923): yellow triangle, red square, blue circle — top of column 2
     paint('Y', P.poly([[264, 84 + 24], [288, 84 + 24], [276, 84]]));
     paint('R', P.rect(264, 120, 24, 24));
@@ -323,12 +332,12 @@ function drawMarks(t) {
   const firsts = [['Y', EV.tri_in.t], ['R', EV.circle_land.t0 + 0.05], ['B', EV.sq_scale.t0 + 0.05], ['K', EV.bar_land.t0 + 0.05]];
   firsts.forEach(([ink, tt], i) => { if (snap(t) >= tt) paint(ink, P.rect(1500 + i * 30, 1043, 24, 14)); });
   const F = '600 13px "Poppins"';
-  text('K', 'BOGEN 09 — KONSTRUKTION IN 20 SCHLÄGEN · 120 BPM · M = 120 PX', 152, 1050, F, 2.6, 'left', 'middle');
-  text('K', 'KINETISCHES PLAKAT · Nº 09 · WEIMAR 1919', 1768, 30, F, 2.6, 'right', 'middle');
+  text('K', CFG.footer, 152, 1050, F, 2.6, 'left', 'middle');
+  text('K', CFG.header, 1768, 30, F, 2.6, 'right', 'middle');
   // beat counter (steps on every beat; 20/20 lands with the press lock at 9.5)
   if (TYPE) {
     const n = clamp(Math.floor(snap(t) / cues.beat + 1e-6) + 1, 1, 20), s = String(n).padStart(2, '0');
-    text('K', 'SCHLAG', 152, 30, F, 2.6, 'left', 'middle');
+    text('K', CFG.counter, 152, 30, F, 2.6, 'left', 'middle');
     for (let i = 0; i < 2; i++) text('K', s[i], 152 + TYPE.lw + i * TYPE.dw, 30, F, 2.6, 'left', 'middle');
     text('K', '/ 20', 152 + TYPE.lw + 2 * TYPE.dw + 6, 30, F, 2.6, 'left', 'middle');
   }
@@ -454,7 +463,7 @@ float inkAt(vec4 sel, bool isK, vec2 p0, vec2 off, float tt){
 void main(){
   vec2 p = vec2(gl_FragCoord.x, RES.y - gl_FragCoord.y);
   p = vec2(960., 540.) + (p - vec2(960., 540.)) / uCam.z + uCam.xy;   // r2: 7.0 punch (x1.03 -> 1) / 9.5 press jolt
-  vec3 paperBase = vec3(241.,233.,218.)/255.;
+  vec3 paperBase = ${glv(CFG.paper)};
   float pl = dot(texture(tPaper, p/2600.).rgb, vec3(.333));
   float tooth = pl - .78;
   float big = vnoise(p/340.) - .5;
@@ -488,7 +497,7 @@ void main(){
   col *= 1. - g*(1. - clamp(max(max(mY,mR),max(mB,mK))*1.2, 0., 1.));
   float mottle = vnoise(p/9.) * .5 + vnoise(p/37.) * .5;
   float dens = clamp(dens0 + .06*(mottle-.5) + tooth*.35, 0., dens0 > 1. ? 1.1 : 1.);
-  vec3 Y = vec3(242.,183.,5.)/255., R = vec3(224.,60.,49.)/255., Bl = vec3(30.,79.,163.)/255., K = vec3(17.)/255.;
+  vec3 Y = ${glv(CFG.yellow)}, R = ${glv(CFG.red)}, Bl = ${glv(CFG.blue)}, K = ${glv(CFG.black)};
   col *= mix(vec3(1.), Y/paperBase, mY*dens);
   col *= mix(vec3(1.), R/paperBase, mR*dens);
   col *= mix(vec3(1.), Bl/paperBase, mB*dens);
@@ -682,10 +691,10 @@ function linkAtV5(t) {
 }
 if (V5) window.linkAt = linkAtV5;
 
-await document.fonts.load(`900 172px "Poppins"`, 'BAUHAUS');
+await document.fonts.load(`900 172px "Poppins"`, CFG.word);
 await document.fonts.load(`600 24px "Poppins"`, 'FORM');
 await document.fonts.load(`600 13px "Poppins"`, 'BOGEN');
-await document.fonts.load(`700 26px "Noto Sans SC"`, '形式色彩功能黄红蓝');
+await document.fonts.load(`700 26px "Noto Sans SC"`, CFG.zh.join('') + CFG.labels.map(l => l[1]).join(''));
 if (V5) await document.fonts.load(TB.font, '几何构成包豪斯');
 await document.fonts.ready;
 measureType();
