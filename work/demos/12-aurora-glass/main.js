@@ -15,7 +15,7 @@ const NOLINK = new Set(V5 ? (Q.get('nolink') || '').split(',').map((s) => s.trim
 const HIDE_DOT = NOLINK.has('dot'), HIDE_TITLE = NOLINK.has('title');
 // v5.2 (jury round 6): title contrast pass (deep pool + halo behind the glass title, brighter glass, clearer line 2). ?v52=0 = v5.1 look
 // ---- 十五画境：可改配置 ----
-const { loadCfg } = await import('/mp/cfg.js');
+const { loadCfg } = await import('../../mp/cfg.js');
 const UI_EN = { name: 'Aurora', now: 'now', thinking: 'thinking', ask: 'Plan a slow Sunday for me.',
     reply: ['Slow breakfast at ten.', 'The lake path at four,', 'when the light turns gold.', 'I’ve cleared the rest.'],
     chips: ['Add to calendar', 'Remind me at 3:30'], listening: 'Listening', caption: '“…keep tonight free”',
@@ -26,9 +26,9 @@ const CFG = loadCfg({ brand: 'Aurora', tagline: 'Think in light.', taglineCn: '�
 const TV5 = V5 || /[\u3400-\u9fff]/.test(CFG.brand);
 const V52 = TV5 && Q.get('v52') !== '0';
 
-const cues = await (await fetch('/demos/12-aurora-glass/cues.json')).json();
+const cues = await (await fetch(new URL('cues.json', import.meta.url))).json();
 let ENV = null;
-try { const r = await fetch('/demos/12-aurora-glass/out/env.json'); if (r.ok) ENV = await r.json(); } catch (e) { ENV = null; }
+try { const r = await fetch(new URL('env.json', import.meta.url)); if (r.ok) ENV = await r.json(); } catch (e) { ENV = null; }
 
 // ------------------------------------------------------------------ math
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -203,7 +203,7 @@ function upload(tex, cv, mip) {
 }
 
 // grain texture
-const grainImg = new Image(); grainImg.src = '/assets/textures/grain/grain_fine_2048.png';
+const grainImg = new Image(); grainImg.src = '../../assets/textures/grain/grain_fine_2048.png';
 await grainImg.decode();
 const grainTex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, grainTex);
 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);

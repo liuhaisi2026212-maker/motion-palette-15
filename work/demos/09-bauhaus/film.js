@@ -11,9 +11,9 @@ const MB = +(Q.get('mb') || window.DEMO.motionBlur.samples);          // harness
 // elements. Without v5 every code path below is the v4 film, unchanged.
 const V5 = Q.get('v5') === '1';
 const NOLINK = new Set(V5 ? (Q.get('nolink') || '').split(',').map(s => s.trim()).filter(Boolean) : []);
-const BASE = '/demos/09-bauhaus/';
+const BASE = new URL('./', import.meta.url).href;
 // ---- 十五画境：可改配置 ----
-const { loadCfg } = await import('/mp/cfg.js');
+const { loadCfg } = await import('../../mp/cfg.js');
 const CFG = loadCfg({ word: 'BAUHAUS', caption: ['FORM', 'FARBE', 'FUNKTION'], zh: ['形式', '色彩', '功能'],
   labels: [['GELB', '黄'], ['ROT', '红'], ['BLAU', '蓝']], counter: 'SCHLAG',
   footer: 'BOGEN 09 — KONSTRUKTION IN 20 SCHLÄGEN · 120 BPM · M = 120 PX', header: 'KINETISCHES PLAKAT · Nº 09 · WEIMAR 1919',
@@ -529,7 +529,7 @@ function tex(unit, src, repeat) {
   return tx;
 }
 async function img(url) { const i = new Image(); i.src = url; await i.decode(); return i; }
-const [paperImg, grainImg] = await Promise.all([img('/assets/textures/paper/Paper001_4K_color.jpg'), img('/assets/textures/grain/grain_fine_2048.png')]);
+const [paperImg, grainImg] = await Promise.all([img('../../assets/textures/paper/Paper001_4K_color.jpg'), img('../../assets/textures/grain/grain_fine_2048.png')]);
 const txA = tex(0, null, false), txB = tex(1, null, false);
 tex(2, paperImg, true); tex(3, grainImg, true);
 gl.uniform1i(U('tA'), 0); gl.uniform1i(U('tB'), 1); gl.uniform1i(U('tPaper'), 2); gl.uniform1i(U('tGrain'), 3);

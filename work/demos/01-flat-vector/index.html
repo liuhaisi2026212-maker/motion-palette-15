@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><title>popwise — One Dot</title>
-<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
 <style>
 html,body{margin:0;padding:0;background:#000;overflow:hidden;width:1920px;height:1080px}
 svg{display:block}
@@ -18,7 +18,7 @@ const S = document.getElementById('S');
 const QS = new URLSearchParams(location.search), V5 = QS.get('v5') === '1';
 const NOLINK = new Set(V5 ? (QS.get('nolink') || '').split(',').map(s => s.trim()).filter(Boolean) : []);
 // ---- 十五画境：可改配置（文字 + 6 个主色），其余色由主色推导 ----
-const { loadCfg, mix, darken, lighten } = await import('/mp/cfg.js');
+const { loadCfg, mix, darken, lighten } = await import('../../mp/cfg.js');
 const CFG = loadCfg({ brand: 'popwise', slogan: '每天 聪明一点点', sloganEn: 'EVERY DAY, A LITTLE WISER', words: ['进步', '搞定', '心动', '攒钱'],
   bg: '#2B2BFF', hero: '#FF5A4E', yellow: '#FFC62B', mint: '#2EE6A8', cream: '#FFF6E9', ink: '#151433' });
 const C = (() => { const U = CFG.bg, CO = CFG.hero, SU = CFG.yellow, MI = CFG.mint, CR = CFG.cream, INK = CFG.ink;
@@ -63,7 +63,7 @@ function pop(t, t0, f = 2.4, z = .42, amt = .12, pin = .9) {
 const hump = u => 4 * u * (1 - u);
 
 // ============================================================ cues + fonts
-const cues = await (await fetch('/demos/01-flat-vector/cues.json')).json();
+const cues = await (await fetch('./cues.json')).json();
 const FR = cues.frames; const F = n => n / 30; const T = k => FR[k] / 30;
 await Promise.all([
   document.fonts.load("700 200px 'Fredoka'", CFG.brand + 'ı'), document.fonts.load("700 200px 'Resource Han Rounded'", CFG.brand), document.fonts.load("600 40px 'Fredoka'", 'EVERY DAY'),

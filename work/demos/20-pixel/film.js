@@ -10,9 +10,9 @@ const V5 = Q.get('v5') === '1';
 const NOLINK = new Set(V5 ? (Q.get('nolink') || '').split(',').map(s => s.trim()).filter(Boolean) : []);
 let linkPass = false;                                   // linkAt() redraws the frame with every element present
 const hidden = id => !linkPass && NOLINK.has(id);
-const cues = await (await fetch('/demos/20-pixel/cues.json')).json();
+const cues = await (await fetch(new URL('cues.json', import.meta.url))).json();
 // ---- 十五画境：可改配置 ----
-const { loadCfg } = await import('/mp/cfg.js');
+const { loadCfg } = await import('../../mp/cfg.js');
 const CFG = loadCfg({ title: 'PIXEL QUEST', ribbon: '像素冒险', speaker: '神秘宝箱', line: '欢迎来到像素世界！', press: 'PRESS START', score: 'SCORE' });
 CFG.speaker = [...CFG.speaker].slice(0, 4).join(''); CFG.line = [...CFG.line].slice(0, 10).join(''); CFG.ribbon = [...CFG.ribbon].slice(0, 6).join('');
 CFG.press = String(CFG.press).toUpperCase().slice(0, 14); CFG.score = String(CFG.score).toUpperCase().slice(0, 6);

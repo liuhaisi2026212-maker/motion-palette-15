@@ -51,7 +51,7 @@
 }
 @font-face {
   font-family: 'Fusion Pixel 12';
-  src: url('/assets/fonts/cjk/fusionpixel/fusion-pixel-12px-proportional-zh_hans.ttf.woff2') format('woff2');
+  src: url('cjk/fusionpixel/fusion-pixel-12px-proportional-zh_hans.ttf.woff2') format('woff2');
   font-weight: 1 1000;
   font-style: normal;
   font-display: block;
@@ -192,7 +192,7 @@
 }
 @font-face {
   font-family: 'Fredoka';
-  src: url('/assets/fonts/latin/fredoka/Fredoka-VF.ttf') format('truetype');
+  src: url('latin/fredoka/Fredoka-VF.ttf') format('truetype');
   font-weight: 300 700;
   font-style: normal;
   font-stretch: 75% 125%;
@@ -228,7 +228,7 @@
 }
 @font-face {
   font-family: 'Inter';
-  src: url('/assets/fonts/latin/inter/Inter-VF.ttf') format('truetype');
+  src: url('latin/inter/Inter-VF.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: block;
@@ -256,21 +256,21 @@
 }
 @font-face {
   font-family: 'Poppins';
-  src: url('/assets/fonts/latin/poppins/Poppins-Black.ttf') format('truetype');
+  src: url('latin/poppins/Poppins-Black.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
   font-display: block;
 }
 @font-face {
   font-family: 'Poppins';
-  src: url('/assets/fonts/latin/poppins/Poppins-SemiBold.ttf') format('truetype');
+  src: url('latin/poppins/Poppins-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
   font-display: block;
 }
 @font-face {
   font-family: 'Press Start 2P';
-  src: url('/assets/fonts/latin/pressstart2p/PressStart2P-Regular.ttf') format('truetype');
+  src: url('latin/pressstart2p/PressStart2P-Regular.ttf') format('truetype');
   font-weight: 1 1000;
   font-style: normal;
   font-display: block;
@@ -291,7 +291,7 @@
 }
 @font-face {
   font-family: 'Sora';
-  src: url('/assets/fonts/latin/sora/Sora-VF.ttf') format('truetype');
+  src: url('latin/sora/Sora-VF.ttf') format('truetype');
   font-weight: 100 800;
   font-style: normal;
   font-display: block;
