@@ -135,7 +135,7 @@
 }
 @font-face {
   font-family: 'ZCOOL KuaiLe';
-  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  src: url('cjk/zcoolkuaile/ZCOOLKuaiLe-Regular.ttf') format('truetype');
   font-weight: 1 1000;
   font-style: normal;
   font-display: block;
@@ -242,7 +242,7 @@
 }
 @font-face {
   font-family: 'Luckiest Guy';
-  src: local('Helvetica Neue'), local('Arial');
+  src: url('latin/luckiestguy/LuckiestGuy-Regular.ttf') format('truetype');
   font-weight: 1 1000;
   font-style: normal;
   font-display: block;

@@ -10,6 +10,6 @@ if (cfgJson) { await pg.evaluate(c => window.__wb.setCfg(JSON.parse(c)), cfgJson
 await pg.screenshot({ path: out.replace(/\.mp4$/, '_ui.png') });
 await pg.select('#quality', quality); const t0 = Date.now(); await pg.evaluate(() => document.getElementById('export').click());
 const iv = setInterval(async () => { try { console.log('progress', await pg.evaluate(() => document.getElementById('barI').style.width)); } catch (e) {} }, 15000);
-await pg.waitForFunction(() => window.__lastExport, { timeout: 900000 }); clearInterval(iv); const res = await pg.evaluate(() => window.__lastExport); console.log('export', res, ((Date.now() - t0) / 1000).toFixed(1) + 's');
+await pg.waitForFunction(() => window.__lastExport, { timeout: 900000 }); clearInterval(iv); const res = await pg.evaluate(() => window.__lastExport); console.log('export', JSON.stringify(res), ((Date.now() - t0) / 1000).toFixed(1) + 's');
 if (!res.error) { const b64 = await pg.evaluate(async () => await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result.split(',')[1]); fr.readAsDataURL(window.__lastBlob); })); fs.writeFileSync(out, Buffer.from(b64, 'base64')); }
 await b.close(); srv.kill();
