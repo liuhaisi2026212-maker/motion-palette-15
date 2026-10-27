@@ -178,7 +178,7 @@
 }
 @font-face {
   font-family: 'Cormorant Garamond';
-  src: local('Helvetica Neue'), local('Arial');
+  src: url('latin/cormorantgaramond/CormorantGaramond-VF.ttf') format('truetype');
   font-weight: 300 700;
   font-style: normal;
   font-display: block;

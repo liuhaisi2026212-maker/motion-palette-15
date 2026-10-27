@@ -9,7 +9,11 @@ const NOLINK = new Set(V5 ? (Q.get('nolink') || '').split(',').filter(Boolean) :
 const W = 1920, H = 1080, FPS = 30, DUR = V5 ? 11 : 10;   // v5: +1 s of poster so the title holds readable
 window.DEMO = { width: W, height: H, fps: FPS, duration: DUR, motionBlur: { samples: 4, shutter: 0.5 } };
 
-const cues = await (await fetch('/demos/02-line-art/cues.json')).json();
+const cues = await (await fetch(new URL('cues.json', import.meta.url))).json();
+// ---- 十五画境：可改配置 ----
+const { loadCfg, darken, lighten, mix } = await import('../../mp/cfg.js');
+const CFG = loadCfg({ brand: 'ATELIER LINEA', tagline: '始于一线', gold: '#E9D7A5', bg: '#0B1320' });
+const rgbOf = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 if (V5) cues.camera.poster_center = [925, 590];   // v5: the poster rides up 30 px to make room for the big title
 
 // ---------------------------------------------------------------- utils
@@ -223,9 +227,9 @@ const applyCam = (g, c) => { g.setTransform(1, 0, 0, 1, 0, 0); g.translate(W / 2
 const toScreen = (c, x, y) => { const dx = (x - c.cx) * c.z, dy = (y - c.cy) * c.z, cs = Math.cos(c.roll), sn = Math.sin(c.roll); return [W / 2 + dx * cs - dy * sn, H / 2 + dx * sn + dy * cs]; };
 
 // ---------------------------------------------------------------- assets
-const grain = new Image(); grain.src = '/assets/textures/grain/grain_fine_2048.png'; await grain.decode();
-await document.fonts.load("500 50px 'Cormorant Garamond'", 'ATELIER LINEA');
-await document.fonts.load("300 26px 'Noto Serif SC'", '始于一线');
+const grain = new Image(); grain.src = '../../assets/textures/grain/grain_fine_2048.png'; await grain.decode();
+await document.fonts.load("500 50px 'Cormorant Garamond'", CFG.brand);
+await document.fonts.load("300 26px 'Noto Serif SC'", CFG.tagline);
 await document.fonts.ready;
 
 // ---------------------------------------------------------------- canvases
@@ -234,7 +238,7 @@ const mk = () => { const c = document.createElement('canvas'); c.width = W; c.he
 const [lineC, lg] = mk();
 const [fillC, fg] = mk();
 const [pulseC, pg] = mk();
-const GOLD = [233, 215, 165], AGED = [150, 125, 80], HOT = [255, 246, 220], NAVY = [11, 19, 32];
+const GOLD = rgbOf(CFG.gold), AGED = rgbOf(mix(darken(CFG.gold, .38), CFG.bg, .1)), HOT = rgbOf(lighten(CFG.gold, .6)), NAVY = rgbOf(CFG.bg);
 const LW = +(Q.get("lw") || 3);   // constant screen-space line width, whole film (the reel renders with ?lw=4.5)
 const CHUNK = 12;
 const MCX = 925, MCY = 330, MR = 135, FY = 454.58;
@@ -252,7 +256,7 @@ function doorPath(g, closed) {
 function drawBackground(c, t) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.filter = 'none';
-  ctx.fillStyle = '#0B1320'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = CFG.bg; ctx.fillRect(0, 0, W, H);
   const rg = ctx.createRadialGradient(W * 0.5, H * 0.46, 0, W * 0.5, H * 0.5, W * 0.62);
   rg.addColorStop(0, 'rgba(26,40,62,0.55)'); rg.addColorStop(0.55, 'rgba(15,25,42,0.25)'); rg.addColorStop(1, 'rgba(4,8,14,0.0)');
   ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
@@ -334,7 +338,7 @@ function drawFill(c, t) {
   fg.setTransform(1, 0, 0, 1, 0, 0); fg.clearRect(0, 0, W, H); fg.globalCompositeOperation = 'source-over';
   applyCam(fg, c);
   const lgr = fg.createLinearGradient(815, 205, 1035, 455);
-  lgr.addColorStop(0, '#F2E0AE'); lgr.addColorStop(0.42, '#DDC284'); lgr.addColorStop(0.7, '#CCAB6C'); lgr.addColorStop(1, '#A8874E');   // r2: +8 %
+  lgr.addColorStop(0, lighten(CFG.gold, .3)); lgr.addColorStop(0.42, darken(CFG.gold, .06)); lgr.addColorStop(0.7, darken(CFG.gold, .14)); lgr.addColorStop(1, darken(CFG.gold, .3));   // r2: +8 %
   fg.beginPath(); fg.arc(MCX, MCY, ro, 0, Math.PI * 2);
   if (ri > 0.3) { fg.moveTo(MCX + ri, MCY); fg.arc(MCX, MCY, ri, 0, Math.PI * 2, true); }
   fg.fillStyle = lgr; fg.fill('evenodd');
@@ -415,7 +419,7 @@ function drawText(c, t) {
   if (t < WM.start) return;
   ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
   applyCam(ctx, c);
-  const word = 'ATELIER LINEA', size = 50, track = 0.46;
+  const word = CFG.brand, size = 50, track = /[\u3400-\u9fff]/.test(CFG.brand) ? 0.3 : 0.46;
   ctx.font = `500 ${size}px 'Cormorant Garamond'`; ctx.textBaseline = 'alphabetic';
   const ws = [...word].map((ch) => ctx.measureText(ch).width);
   const fin = ws.reduce((a, b) => a + b, 0) + track * size * (word.length - 1);
@@ -426,22 +430,22 @@ function drawText(c, t) {
     const u = clamp((t - WM.start - d * WM.stagger) / WM.dur), e = easeOut(u);
     const spread = (1 - e) * 0.22 * size * (i - mid);   // letters track in from wide
     ctx.globalAlpha = smooth(0, 0.8, u) * 0.95;
-    ctx.fillStyle = '#E9D7A5';
+    ctx.fillStyle = CFG.gold;
     ctx.fillText(ch, x + spread, y + (1 - e) * 6);
     x += ws[i] + track * size;
   });
   const tu = clamp((t - WM.tagline) / 0.9), te = easeOut(tu);
   if (tu > 0) {
-    const tag = '始于一线', ts = 26, tt = 0.5, ty = y + 36 + ts;   // r2: 0.5 em so 一 belongs to the word
+    const tag = CFG.tagline, ts = 26, tt = 0.5, ty = y + 36 + ts;   // r2: 0.5 em so 一 belongs to the word
     ctx.font = `300 ${ts}px 'Noto Serif SC'`;
     const tw = [...tag].map((ch) => ctx.measureText(ch).width);
     const tf = tw.reduce((a, b) => a + b, 0) + tt * ts * (tag.length - 1);
     let tx = cx - tf / 2;
-    ctx.globalAlpha = te * 0.9; ctx.fillStyle = '#E9D7A5';
+    ctx.globalAlpha = te * 0.9; ctx.fillStyle = CFG.gold;
     [...tag].forEach((ch, i) => { ctx.fillText(ch, tx, ty + (1 - te) * 4); tx += tw[i] + tt * ts; });
     // the pen signs off: two hairline rules drawn outward from the tagline, each by a small glint
     const ru = easeIO(clamp((t - cues.rules[0]) / (cues.rules[1] - cues.rules[0]))), hl = 24 * ru, ry = ty - 9.5, gap = 1.2 * ts;   // r2: short 1 px rules, 1.2 em gap
-    ctx.globalAlpha = 0.55; ctx.fillStyle = '#E9D7A5'; const rh = 1 / c.z;
+    ctx.globalAlpha = 0.55; ctx.fillStyle = CFG.gold; const rh = 1 / c.z;
     ctx.fillRect(cx - tf / 2 - gap - hl, ry - rh / 2, hl, rh); ctx.fillRect(cx + tf / 2 + gap, ry - rh / 2, hl, rh);
     const gv = smooth(cues.rules[0] - 0.08, cues.rules[0] + 0.02, t) * (1 - smooth(cues.rules[1] - 0.05, cues.rules[1] + 0.15, t));
     if (gv > 0) {
@@ -466,7 +470,7 @@ const TT = { size: 165, track: 0.2, top: 790, cx: 925, start: 8.45, stagger: 0.0
 const easeTitle = cubicBezier(0.45, 0, 0.25, 1);
 let TITLE = null;
 if (V5) {
-  const J = await (await fetch('/demos/02-line-art/v5_title.json')).json();
+  const J = await (await fetch(new URL('v5_title.json', import.meta.url))).json();
   const k = TT.size / J.upm, raw = [];
   let x = 0, minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
   for (const g of J.glyphs) {
@@ -551,7 +555,7 @@ function drawTextV5(c, t) {   // small secondary line under the title, set like 
   const tw = [...tag].map((ch) => ctx.measureText(ch).width);
   const tf = tw.reduce((a, b) => a + b, 0) + tt * ts * (tag.length - 1);
   let tx = cx - tf / 2;
-  ctx.globalAlpha = te * 0.95; ctx.fillStyle = '#E9D7A5';
+  ctx.globalAlpha = te * 0.95; ctx.fillStyle = CFG.gold;
   [...tag].forEach((ch, i) => { ctx.fillText(ch, tx, ty + (1 - te) * 4); tx += tw[i] + tt * ts; });
   const ru = easeIO(clamp((t - TT.rules[0]) / (TT.rules[1] - TT.rules[0]))), hl = 28 * ru, ry = ty - 0.3 * ts, gap = 1.1 * ts;
   ctx.globalAlpha = 0.55 * te; const rh = 1 / c.z;
