@@ -11,6 +11,12 @@ const NOLINK = new Set(V5 ? (Q.get('nolink') || '').split(',').map(s => s.trim()
 let linkPass = false;                                   // linkAt() redraws the frame with every element present
 const hidden = id => !linkPass && NOLINK.has(id);
 const cues = await (await fetch('/demos/20-pixel/cues.json')).json();
+// ---- 十五画境：可改配置 ----
+const { loadCfg } = await import('/mp/cfg.js');
+const CFG = loadCfg({ title: 'PIXEL QUEST', ribbon: '像素冒险', speaker: '神秘宝箱', line: '欢迎来到像素世界！', press: 'PRESS START', score: 'SCORE' });
+CFG.speaker = [...CFG.speaker].slice(0, 4).join(''); CFG.line = [...CFG.line].slice(0, 10).join(''); CFG.ribbon = [...CFG.ribbon].slice(0, 6).join('');
+CFG.press = String(CFG.press).toUpperCase().slice(0, 14); CFG.score = String(CFG.score).toUpperCase().slice(0, 6);
+const CT = CFG.title !== 'PIXEL QUEST';   // 自定义标题：用原片 v5 的「像素字体放大成 logo」做法，中英文都行
 const F = t => Math.round(t * FPS);
 
 // ------------------------------------------------------------------ palette
@@ -318,7 +324,7 @@ function buildLogo() {
 }
 const LOGO0 = buildLogo(), LOGO = LOGO0;
 // v5 title 「像素风」: Fusion Pixel 12 glyph bitmaps, 1 font px = C5×C5 logical px, same fill ramp / top bevel / drop / outline
-const C5 = 4, EXT5 = 2, SP5 = 1, Y5 = 18, RIB5 = 72;
+let C5 = 4; const EXT5 = 2, SP5 = 1, Y5 = 18, RIB5 = 72;
 function buildLogo5(str) {
   const gs = [...str].map(ch => glyph(ch, 'Fusion Pixel 12', 12)), cols = []; let t = 99, b = -1;
   for (const g of gs) { let l = 99, r = -1; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) if (g.m[y * g.w + x]) { t = Math.min(t, y); b = Math.max(b, y); l = Math.min(l, x); r = Math.max(r, x); } cols.push([l, r]); }
@@ -343,7 +349,7 @@ function buildLogo5(str) {
   cn.sort((a, b2) => a[0] - b2[0]); const glint = [0.04, 0.78, 0.36, 0.96, 0.58].map(u => cn[Math.min(cn.length - 1, Math.floor(u * cn.length))]);
   return { w, h, d: o2, fill, glint, gh: LH };
 }
-const LOGO5 = V5 ? buildLogo5('像素风') : null;
+const LOGO5 = V5 ? buildLogo5('像素风') : CT ? (() => { let L = buildLogo5(CFG.title); while (L.w > 300 && C5 > 2) { C5--; L = buildLogo5(CFG.title); } return L; })() : null;
 
 // ------------------------------------------------------------------ background layers (precomputed slot bitmaps)
 function layer(w, fn) { const d = new Uint8Array(w * H); for (let y = 0; y < H; y++) for (let x = 0; x < w; x++) d[y * w + x] = fn(x, y) || 0; return { w, d }; }
@@ -648,7 +654,7 @@ function drawFireflies(f) {
 function drawHUD(f) {
   if (f >= fBoxO) return;
   const [s, c] = scoreAt(f);
-  text('SCORE', 16, 17, 'Press Start 2P', 8, M(8), M(0));
+  text(CFG.score, 16, 17, 'Press Start 2P', 8, M(8), M(0));
   text(String(s).padStart(6, '0'), 16, 27, 'Press Start 2P', 8, M(14), M(0));
   blit(COIN[Math.floor(f / 3) & 3], 262, 8);
   text('x' + String(c).padStart(2, '0'), 272, 17, 'Press Start 2P', 8, M(8), M(0));
@@ -665,17 +671,17 @@ function drawBox(f) {
   const tx = 165; blit(TAIL, tx - 3, y0 + h - 6); rect(tx - 3, y0 + h - 6, 13, 3, M(2)); rect(tx, y0 + h - 3, 7, 3, M(2));   // speech tail -> chest
   // name tag
   const ty = y0 - 8; { const tx = 82; rect(tx, ty, 56, 13, M(0)); rect(tx + 1, ty + 1, 54, 11, M(26)); rect(tx + 1, ty + 1, 54, 1, M(27));
-  text('神秘宝箱', tx + 4, ty + 11, 'Fusion Pixel 12', 12, M(14), M(0)); }
-  const n = f < fType ? 0 : Math.min(9, Math.floor((f - fType) / 3) + 1);
+  text(CFG.speaker, tx + 4, ty + 11, 'Fusion Pixel 12', 12, M(14), M(0)); }
+  const NLINE = [...CFG.line].length, n = f < fType ? 0 : Math.min(NLINE, Math.floor((f - fType) / 3 * 9 / Math.max(9, NLINE)) + 1);
   const talk = f >= fType && f < fType + 27 && (Math.floor((f - fType) / 3) % 2 === 0);
   rect(x0 + 5, y0 + 5, 24, 20, M(1)); blit(talk ? CHEST_TALK : CHEST, x0 + 7, y0 + (talk ? 6 : 7));
-  text('欢迎来到像素世界！', x0 + 34, y0 + 22, 'Fusion Pixel 12', 12, M(8), M(1), 1, n);
+  text(CFG.line, x0 + 34, y0 + 22, 'Fusion Pixel 12', 12, M(8), M(1), 1, n);
   if (f >= fType + 27 && ((f >> 2) & 1) === 0) { const ax = x0 + w - 14, ay = y0 + h - 9; for (let j = 0; j < 3; j++) for (let i = j; i < 5 - j; i++) px(ax + i, ay + j, M(14)); }
 }
 function drawLogo(f) {
   if (f < fLogo - 12) return 0;
-  const LOGO = V5 ? LOGO5 : LOGO0;
-  const X = (W - LOGO.w) >> 1, Y = V5 ? Y5 : 16;
+  const LOGO = V5 || CT ? LOGO5 : LOGO0;
+  const X = (W - LOGO.w) >> 1, Y = V5 || CT ? Y5 : 16;
   const BOUNCE = { 0: 0, 1: -5, 2: -2, 3: 0 };
   const i = f - (fLogo - 12), dy = f < fLogo ? Math.round(-128 * (1 - (i / 12) ** 2)) : (BOUNCE[Math.floor((f - fLogo) / 2)] ?? 0);   // gravity: spacing grows every frame
   const flash = f === fLogo ? M(8) : f === fLogo + 1 ? M(15) : 0;
@@ -691,10 +697,10 @@ function drawLogo(f) {
       for (let y = Math.floor(yb - r); y <= yb + r; y++) for (let x = Math.floor(pcx - r * 1.4); x <= pcx + r * 1.4; x++) { const d = Math.hypot((x - pcx) / 1.4, y - yb);
         if (d <= r && bay(x, y) < dens * (1 - d / (r + 1) * 0.5)) px(x, y, d < r * 0.5 && a < 5 ? M(15) : M(31)); } } }
   // glints in the hold
-  if (f >= fSub + 6) { const G = V5 ? LOGO.glint.map(([gx, gy]) => [X + gx, Y + gy]) : [[X + 3, Y + 2], [X + LOGO.w - 26, Y + 38], [X + 58, Y + 1], [X + LOGO.w - 4, Y + 4], [X + 30, Y + 37]];
+  if (f >= fSub + 6) { const G = V5 || CT ? LOGO.glint.map(([gx, gy]) => [X + gx, Y + gy]) : [[X + 3, Y + 2], [X + LOGO.w - 26, Y + 38], [X + 58, Y + 1], [X + LOGO.w - 4, Y + 4], [X + 30, Y + 37]];
     const g = Math.floor((f - fSub) / 9) % G.length, a = (f - fSub) % 9; if (a < 6) { const s = SPARK[a < 2 ? 0 : a < 4 ? 2 : 1]; blit(s, G[g][0] - (s.w >> 1), G[g][1] - (s.h >> 1)); } }
   if (f >= fLogo && f < fLogo + 9) { const a = f - fLogo, Yl = Y + dy;
-    const y1 = V5 ? LOGO.h - 4 : 64, y2 = V5 ? Math.round(LOGO.h * 0.25) : 18, y3 = V5 ? Math.round(LOGO.h * 0.65) : 46;
+    const y1 = V5 || CT ? LOGO.h - 4 : 64, y2 = V5 || CT ? Math.round(LOGO.h * 0.25) : 18, y3 = V5 || CT ? Math.round(LOGO.h * 0.65) : 46;
     const EM = [[X + 12, Yl + y1, -2, 1], [X + LOGO.w - 12, Yl + y1, 2, 1], [X - 2, Yl + y2, -3, -1], [X + LOGO.w + 2, Yl + y2, 3, -1], [X + 44, Yl - 2, -1, -2], [X + LOGO.w - 44, Yl - 2, 1, -2], [X - 2, Yl + y3, -3, 1], [X + LOGO.w + 2, Yl + y3, 3, 1]];
     for (const [ex, ey, vx, vy] of EM) { const s = SPARK[a < 3 ? 2 : a < 6 ? 1 : 0]; blit(s, ex + vx * a - (s.w >> 1), ey + vy * a - (s.h >> 1)); } }
   return logoShake(f);
@@ -703,18 +709,18 @@ const logoShake = f => f >= fLogo && f < fLogo + 6 ? [3, -3, 2, -1, 1, 0][f - fL
 const shakeAt = f => logoShake(f) || (f >= FLASH && f < FLASH + 4 ? [2, -2, 1, -1][f - FLASH] : 0) || ({ [LH1]: 0.5, [LH1 + 1]: -0.5, [LH2]: 1, [LH2 + 1]: -0.5 }[f] ?? 0);
 function drawRibbon(f) {
   if (f < fSub) return;
-  const k = f - fSub, full = 88, w = k < 1 ? 16 : k < 2 ? 40 : k < 3 ? 64 : full, cx = 160, y0 = V5 ? RIB5 : 88, h = 15, x0 = cx - (w >> 1);
+  const k = f - fSub, full = Math.max(88, textW(CFG.ribbon, 'Fusion Pixel 12', 12, 5) + 26), w = k < 1 ? 16 : k < 2 ? Math.round(full * .45) : k < 3 ? Math.round(full * .73) : full, cx = 160, y0 = V5 || CT ? Math.max(RIB5, Y5 + LOGO5.h + 6) : 88, h = 15, x0 = cx - (w >> 1);
   if (w === full) { for (const side of [-1, 1]) { const ex = side < 0 ? x0 - 10 : x0 + w; rect(ex, y0 + 4, 10, h, M(0)); rect(ex + 1, y0 + 5, 8, h - 2, M(26));
       for (let j = 0; j < 5; j++) for (let i = 0; i < 5 - j; i++) px(side < 0 ? ex + i : ex + 9 - i, y0 + 6 + j + 3, M(0)); } }
   rect(x0, y0, w, h, M(0)); rect(x0 + 1, y0 + 1, w - 2, h - 2, M(27)); rect(x0 + 1, y0 + 1, w - 2, 1, M(12)); rect(x0 + 1, y0 + h - 2, w - 2, 1, M(26));
   if (V5) { const str = 'PIXEL ART', n = [2, 5, 7, 9][Math.min(3, Math.floor(k / 3))], tw = textW(str, 'Press Start 2P', 8);   // v5: small English line, the logo is the name
     if (w === full) text(str, cx - (tw >> 1), y0 + 11, 'Press Start 2P', 8, M(8), M(26), 0, n); return; }
-  const str = '像素冒险', n = Math.min(4, Math.floor(k / 3) + 1), tw = textW(str, 'Fusion Pixel 12', 12, 5);
+  const str = CFG.ribbon, n = Math.min([...str].length, Math.floor(k / 3) + 1), tw = textW(str, 'Fusion Pixel 12', 12, 5);
   if (w === full) text(str, cx - (tw >> 1), y0 + 12, 'Fusion Pixel 12', 12, M(8), M(26), 5, n);
 }
 function drawPress(f) {
   if (f < fPress || ((f - fPress) % 24) >= 12) return;
-  const s = 'PRESS START', w = textW(s, 'Press Start 2P', 8), x = 160 - (w >> 1), b = 168;
+  const s = CFG.press, w = textW(s, 'Press Start 2P', 8), x = 160 - (w >> 1), b = 168;
   rect(x - 4, b - 11, w + 8, 14, M(0)); rect(x - 3, b - 10, w + 6, 12, M(1));
   for (const [ox, oy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) text(s, x + ox, b + oy, 'Press Start 2P', 8, M(0), 0);
   text(s, x, b, 'Press Start 2P', 8, M(8), 0);

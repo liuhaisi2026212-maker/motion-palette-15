@@ -51,7 +51,7 @@
 }
 @font-face {
   font-family: 'Fusion Pixel 12';
-  src: local('PingFang SC Semibold'), local('PingFangSC-Semibold'), local('Microsoft YaHei Bold'), local('Noto Sans CJK SC Bold'), local('Source Han Sans SC Bold');
+  src: url('/assets/fonts/cjk/fusionpixel/fusion-pixel-12px-proportional-zh_hans.ttf.woff2') format('woff2');
   font-weight: 1 1000;
   font-style: normal;
   font-display: block;

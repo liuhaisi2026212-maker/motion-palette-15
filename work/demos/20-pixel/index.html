@@ -5,7 +5,7 @@
 </head><body>
 <canvas id="c" width="1920" height="1080"></canvas>
 <script type="module">
-  await document.fonts.load('12px "Fusion Pixel 12"', '神秘宝箱欢迎来到像素世界！像素冒险');
+  await document.fonts.load('12px "Fusion Pixel 12"', '神秘宝箱欢迎来到像素世界！像素冒险' + decodeURIComponent(location.search));
   await document.fonts.load('8px "Press Start 2P"', 'SCORE PRESS START x0123456789');
   if (new URLSearchParams(location.search).get('v5') === '1') {   // reel v5 title 「像素风」 + PIXEL ART
     await document.fonts.load('12px "Fusion Pixel 12"', '像素风');
