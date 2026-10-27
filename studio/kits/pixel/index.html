@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>像素风 · 十五画境创作版</title>
+<style>
+@font-face { font-family: 'Fusion Pixel 12'; src: url('../../assets/fonts/fusion-pixel-12.woff2') format('woff2'); font-display: block; }
+@font-face { font-family: 'Press Start 2P'; src: url('../../assets/fonts/PressStart2P-Regular.ttf') format('truetype'); font-display: block; }
+html, body { margin: 0; background: #000; overflow: hidden; }
+canvas { display: block; width: 1920px; height: 1080px; image-rendering: pixelated; }
+</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+import { boot, readSpec } from '../../lib/core.js';
+import { buildFilm } from './kit.js';
+import { EXAMPLE } from './example.js';
+const spec = readSpec(EXAMPLE);
+const allText = JSON.stringify(spec);
+await boot({ width: 1920, height: 1080, fps: 30, fonts: [['12px "Fusion Pixel 12"', allText + '像素冒险'], ['8px "Press Start 2P"', 'STAGE 0123456789 PRESS START']] },
+  async () => buildFilm(spec, document.getElementById('c')));
+</script></body></html>

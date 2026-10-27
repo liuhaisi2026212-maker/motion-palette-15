@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>十五画境创作版</title>
+<style>
+:root { --bg:#f3f1ec; --panel:#fff; --ink:#1b1a18; --muted:#6f6b63; --line:#e2ddd4; --accent:#e8553d; --ok:#2f8f5b; --warn:#b26b00; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#121212; --panel:#1c1c1c; --ink:#eeeae3; --muted:#9b968d; --line:#302d29; --accent:#ff6a50; --ok:#5cc28a; --warn:#e8a54a; } }
+:root[data-theme="dark"] { --bg:#121212; --panel:#1c1c1c; --ink:#eeeae3; --muted:#9b968d; --line:#302d29; --accent:#ff6a50; --ok:#5cc28a; --warn:#e8a54a; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 "PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+header { display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; padding:16px 18px 4px; }
+header h1 { margin:0; font-size:20px; } header span { color:var(--muted); font-size:13px; }
+.layout { display:grid; grid-template-columns: minmax(0,1fr) 420px; gap:14px; padding:10px 18px 24px; align-items:start; }
+@media (max-width:1100px) { .layout { grid-template-columns:1fr; padding:10px 16px 24px; } }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px; }
+.kits { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.kits button.on { border-color:var(--accent); font-weight:700; }
+.stage { position:relative; width:100%; aspect-ratio:16/9; background:#0c0c0c; border-radius:10px; overflow:hidden; margin:0 auto; }
+.stage.portrait { aspect-ratio:9/16; width:min(100%, 62vh); }
+.stage iframe { position:absolute; left:0; top:0; border:0; transform-origin:0 0; pointer-events:none; }
+.stage .veil { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; background:rgba(0,0,0,.55); font-size:15px; text-align:center; padding:20px; }
+.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+button, select { font:inherit; border:1px solid var(--line); background:var(--panel); color:var(--ink); border-radius:9px; padding:7px 12px; cursor:pointer; }
+button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700; }
+button:disabled { opacity:.5; cursor:default; }
+input[type=range] { flex:1; min-width:140px; accent-color:var(--accent); }
+.time { color:var(--muted); font-variant-numeric:tabular-nums; min-width:84px; text-align:right; font-size:13px; }
+.bar { height:6px; background:var(--line); border-radius:3px; overflow:hidden; margin-top:8px; display:none; } .bar.on { display:block; } .bar i { display:block; height:100%; width:0; background:var(--accent); }
+.msg { font-size:13px; margin-top:8px; white-space:pre-line; } .msg.err { color:var(--accent); } .msg.warn { color:var(--warn); } .msg.ok { color:var(--ok); }
+textarea { width:100%; min-height:380px; resize:vertical; font:12.5px/1.5 "SF Mono",Menlo,Consolas,monospace; background:var(--bg); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:10px; }
+ol.steps { margin:0 0 10px; padding-left:18px; color:var(--muted); font-size:13px; } ol.steps b { color:var(--ink); }
+h2 { font-size:15px; margin:0 0 8px; } .about { color:var(--muted); font-size:13px; margin:10px 2px 0; }
+.photos { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; } .photos figure { margin:0; position:relative; } .photos img { width:64px; height:64px; object-fit:cover; border-radius:8px; display:block; }
+.photos figcaption { position:absolute; left:4px; top:4px; background:rgba(0,0,0,.7); color:#fff; font-size:11px; padding:0 5px; border-radius:6px; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; } .chip { font-size:12px; border:1px solid var(--line); border-radius:999px; padding:3px 9px; color:var(--muted); cursor:pointer; background:transparent; } .chip.on { border-color:var(--accent); color:var(--ink); }
+</style>
+</head>
+<body>
+<header><h1>十五画境 · 创作版</h1><span>说一个主题 → AI 写镜头表 → 生成这个风格的新视频（不是套原片）</span></header>
+<div class="layout">
+  <main class="card">
+    <div class="kits" id="kits"></div>
+    <div class="stage" id="stage"><iframe id="film" title="预览"></iframe><div class="veil" id="veil">加载中…</div></div>
+    <div class="row"><button id="play" class="primary">▶ 播放</button><input id="scrub" type="range" min="0" max="1000" value="0"><span class="time" id="time">0.0 / 0.0 秒</span></div>
+    <div class="chips" id="chips"></div>
+    <div class="row"><button id="export" class="primary" disabled>⬇ 导出 MP4（带配乐）</button></div>
+    <div class="bar" id="bar"><i id="barI"></i></div>
+    <div class="msg" id="exmsg"></div>
+    <p class="about" id="about"></p>
+  </main>
+  <aside class="card">
+    <h2>镜头表</h2>
+    <ol class="steps">
+      <li>点 <b>复制给AI的提示词</b>，发给豆包 / DeepSeek / Kimi / ChatGPT 等任意 AI，在【我的主题和需求】里写你要讲的内容。</li>
+      <li>把 AI 回的 JSON 整段贴到下面，预览会自动更新。</li>
+      <li>满意后点 <b>导出 MP4</b>。</li>
+    </ol>
+    <div class="row" style="margin-top:0;margin-bottom:8px"><button id="copy">复制给AI的提示词</button><button id="example">换回示例</button></div>
+    <div id="photoBox" hidden><button id="addPhoto">＋ 上传照片（当背景）</button><input id="file" type="file" accept="image/*" multiple hidden><div class="photos" id="photos"></div></div>
+    <textarea id="spec" spellcheck="false"></textarea>
+    <div class="msg" id="msg"></div>
+  </aside>
+</div>
+<script type="module">
+import { KITS, promptFor, parseLoose, checkSpec } from './lib/kits.js';
+import { Muxer, ArrayBufferTarget } from './lib/mp4-muxer.js';
+const $ = id => document.getElementById(id), film = $('film'), stage = $('stage');
+let kit = null, T = 0, DUR = 10, FPS = 30, VW = 1920, VH = 1080, playing = false, last = 0, busy = false, loaded = false, tok = 0, audio = null, actx = null, src = null;
+window.__MP_IMAGES = []; window.__MP_SPEC = null;
+
+KITS.forEach(k => { const b = document.createElement('button'); b.textContent = k.name; b.dataset.id = k.id; b.onclick = () => pick(k.id); $('kits').appendChild(b); });
+const fit = () => { film.style.transform = `scale(${stage.clientWidth / VW})`; }; new ResizeObserver(fit).observe(stage);
+
+function pick(id, keepSpec) { if (busy) return; kit = KITS.find(k => k.id === id); [...$('kits').children].forEach(b => b.classList.toggle('on', b.dataset.id === id));
+  $('about').textContent = kit.about; $('photoBox').hidden = !kit.photos; VW = kit.portrait ? 1080 : 1920; VH = kit.portrait ? 1920 : 1080; stage.classList.toggle('portrait', !!kit.portrait);
+  film.style.width = VW + 'px'; film.style.height = VH + 'px'; fit();
+  if (!keepSpec) { $('spec').value = JSON.stringify(kit.example, null, 2); window.__MP_SPEC = kit.example; $('msg').textContent = ''; }
+  reload(); }
+function reload() { if (busy) return; const my = ++tok; setPlay(false); loaded = false; $('export').disabled = true; $('veil').hidden = false; $('veil').textContent = '生成中…'; audio = null;
+  film.src = `kits/${kit.id}/index.html?v=${my}`; const t0 = performance.now();
+  (function wait() { if (my !== tok) return; const w = film.contentWindow;
+    let fresh = false; try { fresh = w && w.location.search.includes('v=' + my); } catch (e) {}   // 只认这次加载的新页面，旧页面还没卸载时不算
+    if (fresh && w.__ready && w.renderAt) { DUR = w.DEMO.duration; FPS = w.DEMO.fps; $('veil').hidden = true; loaded = true; $('export').disabled = false; chips(); draw(); prepAudio(w, my); return; }
+    if (performance.now() - t0 > 30000) { $('veil').textContent = '加载失败。请确认是双击「启动工作台」打开的，不是直接双击网页。'; return; } setTimeout(wait, 120); })(); }
+async function prepAudio(w, my) { if (!w.MP_AUDIO) return; const a = await w.MP_AUDIO(); if (my !== tok) return; audio = a; }
+function chips() { const shots = (window.__MP_SPEC?.shots) || []; let t = 0; $('chips').innerHTML = '';
+  shots.forEach((s, i) => { const d = Math.min(8, Math.max(1.2, +s.seconds || 3)), b = document.createElement('button'); b.className = 'chip'; b.textContent = `${i + 1} ${s.type}`; const st = t; b.onclick = () => { T = st + .05; setPlay(false); draw(); }; b.dataset.t0 = t; b.dataset.t1 = t + d; $('chips').appendChild(b); t += d; }); }
+async function draw() { const w = film.contentWindow; if (!w?.renderAt) return; await w.renderAt(Math.min(T, DUR - 1 / FPS)); $('time').textContent = `${T.toFixed(1)} / ${DUR.toFixed(1)} 秒`; $('scrub').value = Math.round(T / DUR * 1000);
+  [...$('chips').children].forEach(c => c.classList.toggle('on', T >= +c.dataset.t0 && T < +c.dataset.t1)); }
+let drawing = false;
+function tick(now) { if (!playing) return; T = actx && src ? actx.currentTime - src._t0 : T + (now - last) / 1000; last = now; if (T >= DUR) { T = 0; setPlay(false); draw(); return; }
+  if (!drawing) { drawing = true; draw().finally(() => drawing = false); } requestAnimationFrame(tick); }
+function setPlay(on) { playing = on; $('play').textContent = on ? '❚❚ 暂停' : '▶ 播放'; if (src) { try { src.stop(); } catch (e) {} src = null; }
+  if (on) { if (audio) { actx ||= new AudioContext(); const buf = actx.createBuffer(2, audio.left.length, audio.sampleRate); buf.copyToChannel(audio.left, 0); buf.copyToChannel(audio.right, 1); src = actx.createBufferSource(); src.buffer = buf; src.connect(actx.destination); src._t0 = actx.currentTime - T; src.start(0, T); }
+    last = performance.now(); requestAnimationFrame(tick); } }
+$('play').onclick = () => { if (busy || !loaded) return; setPlay(!playing); };
+$('scrub').oninput = e => { if (busy) return; setPlay(false); T = e.target.value / 1000 * DUR; draw(); };
+
+// 镜头表编辑
+let tm; $('spec').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(applySpec, 700); });
+function applySpec() { const m = $('msg'); try { const [raw, fixed] = parseLoose($('spec').value); if (raw.kit && raw.kit !== kit.id && KITS.find(k => k.id === raw.kit)) { kit = KITS.find(k => k.id === raw.kit); }
+    const { spec, warn } = checkSpec(kit, raw); window.__MP_SPEC = spec; m.className = 'msg ' + (warn.length || fixed ? 'warn' : 'ok');
+    m.textContent = (fixed ? '· 格式有小问题（中文引号、多余逗号），已自动修正\n' : '') + warn.map(w => '· ' + w).join('\n') + `${warn.length || fixed ? '\n' : ''}已更新：${spec.shots.length} 个镜头`; pick(kit.id, true); }
+  catch (e) { m.className = 'msg err'; m.textContent = '看不懂这段内容，请让 AI 只输出一段 JSON。'; } }
+$('example').onclick = () => pick(kit.id);
+$('copy').onclick = async () => { const p = promptFor(kit); try { await navigator.clipboard.writeText(p); $('copy').textContent = '已复制 ✓'; } catch (e) { $('spec').value = p; $('copy').textContent = '复制失败，已放进下面框里'; } setTimeout(() => $('copy').textContent = '复制给AI的提示词', 2500); };
+// 照片
+$('addPhoto').onclick = () => $('file').click();
+$('file').onchange = () => { for (const f of $('file').files) window.__MP_IMAGES.push(URL.createObjectURL(f)); $('file').value = ''; renderPhotos(); reload(); };
+function renderPhotos() { $('photos').innerHTML = window.__MP_IMAGES.map((u, i) => `<figure><img src="${u}"><figcaption>@${i + 1}</figcaption></figure>`).join(''); }
+
+// 导出：逐帧渲染 + WebCodecs 编码 H.264/AAC → MP4
+async function pickCodec(w, h, fps) { for (const codec of ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.42003e']) { const c = { codec, width: w, height: h, bitrate: 14e6, framerate: fps }; try { if ((await VideoEncoder.isConfigSupported(c)).supported) return c; } catch (e) {} } return null; }
+$('export').onclick = async () => {
+  if (busy || !loaded) return; const msg = $('exmsg');
+  if (!('VideoEncoder' in window)) { msg.className = 'msg err'; msg.textContent = '这个浏览器不支持导出。请用最新版 Chrome 或 Edge 打开。'; return; }
+  busy = true; setPlay(false); $('export').disabled = true; $('bar').classList.add('on'); msg.className = 'msg'; msg.textContent = '正在导出，不要关掉这个页面…';
+  try { const w = film.contentWindow, N = Math.round(DUR * FPS), cv = w.document.querySelector('canvas'), vc = await pickCodec(VW, VH, FPS); if (!vc) throw new Error('浏览器不支持 H.264 编码');
+    const a = audio || (w.MP_AUDIO ? await w.MP_AUDIO() : null);
+    const canAudio = a && 'AudioEncoder' in window && (await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: a.sampleRate, numberOfChannels: 2, bitrate: 192000 }).catch(() => ({}))).supported;
+    const muxer = new Muxer({ target: new ArrayBufferTarget(), fastStart: 'in-memory', video: { codec: 'avc', width: VW, height: VH, frameRate: FPS }, ...(canAudio ? { audio: { codec: 'aac', sampleRate: a.sampleRate, numberOfChannels: 2 } } : {}) });
+    let err = null; const venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => err = e }); venc.configure(vc);
+    for (let i = 0; i < N; i++) { if (err) throw err; await w.renderAt(i / FPS); const vf = new VideoFrame(cv, { timestamp: Math.round(i * 1e6 / FPS), duration: Math.round(1e6 / FPS) }); venc.encode(vf, { keyFrame: i % (FPS * 2) === 0 }); vf.close();
+      while (venc.encodeQueueSize > 6) await new Promise(r => setTimeout(r, 5)); if (i % 3 === 0) { $('barI').style.width = (i / N * 92) + '%'; await new Promise(r => setTimeout(r, 0)); } }
+    await venc.flush();
+    if (canAudio) { const aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => err = e }); aenc.configure({ codec: 'mp4a.40.2', sampleRate: a.sampleRate, numberOfChannels: 2, bitrate: 192000 });
+      const total = Math.min(a.left.length, Math.round(DUR * a.sampleRate)), step = 4096;
+      for (let o = 0; o < total; o += step) { const n = Math.min(step, total - o), buf = new Float32Array(n * 2); buf.set(a.left.subarray(o, o + n), 0); buf.set(a.right.subarray(o, o + n), n);
+        const ad = new AudioData({ format: 'f32-planar', sampleRate: a.sampleRate, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round(o / a.sampleRate * 1e6), data: buf }); aenc.encode(ad); ad.close(); }
+      await aenc.flush(); }
+    if (err) throw err; muxer.finalize(); const blob = new Blob([muxer.target.buffer], { type: 'video/mp4' });
+    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `十五画境_${kit.name}_${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '')}.mp4`; link.click();
+    $('barI').style.width = '100%'; msg.className = 'msg ok'; msg.textContent = `已下载 MP4（${(blob.size / 1048576).toFixed(1)} MB，${VW}×${VH}，${FPS}fps，${DUR.toFixed(1)} 秒${canAudio ? '，带配乐' : ''}）`;
+    window.__lastExport = { size: blob.size, frames: N, audio: !!canAudio }; window.__lastBlob = blob;
+  } catch (e) { msg.className = 'msg err'; msg.textContent = '导出失败：' + (e.message || e); window.__lastExport = { error: String(e.message || e) }; }
+  busy = false; $('export').disabled = false; T = 0; draw(); };
+
+pick(KITS[0].id);
+window.__wb = { pick, setSpec: s => { $('spec').value = typeof s === 'string' ? s : JSON.stringify(s, null, 2); applySpec(); }, get ready() { return loaded; } };
+</script>
+</body>
+</html>
