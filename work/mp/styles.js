@@ -48,7 +48,13 @@ export const STYLES = [
     ],
     example: { hero: '灵感爆炸', mast: 'LIUYE', mastCn: '柳爷周刊', band: 'IDEAS ARE A COLLAGE', issue: 'Nº09 · IDEAS ARE A COLLAGE · 2026', header: 'LIUYE WEEKLY — Nº09 — 2026',
       price: 'LIUYE WEEKLY — ¥9.90', stamp: 'Nº09', gift1: '关注就送', gift2: '灵感一车', giftEn: 'IDEAS INCLUDED', cough: '嗯哼' } },
-  { id: '07-liquid', name: '液态流动', en: 'Liquid', work: 'drop.「万物始于一滴」' },
+  { id: '07-liquid', name: '液态流动', en: 'Liquid', work: 'drop.「万物始于一滴」', ready: true,
+    about: '紫色背景里一滴彩色液体落下、溅开、弹起，分成四颗水珠，再融成四个果冻质感的大字，表面一直在流动、滴落。适合饮品、美妆、潮玩、年轻品牌。',
+    fields: [
+      { key: 'word', label: '四个字', type: 'text', max: 4, tip: '正好 4 个：英文小写字母最像原片（如 drop），中文 4 个字也行' },
+      { key: 'tagline', label: '中文标语', type: 'text', max: 10 }, { key: 'taglineEn', label: '英文标语', type: 'text', max: 32 },
+    ],
+    example: { word: 'liuy', tagline: '一切始于灵感', taglineEn: 'EVERYTHING BEGINS AS AN IDEA' } },
   { id: '08-morph', name: '形变动画', en: 'Morph', work: 'morphe.「一形万象」', ready: true,
     about: '一个形状一路变形讲完一天：咖啡杯 → 太阳 → 落日 → 海鸥 → 纸飞机 → 定位针 → 爱心，最后变成品牌名的第一个字母，其余字母飞进来落定。适合讲一个过程、一段旅程。',
     fields: [

@@ -214,14 +214,14 @@
 }
 @font-face {
   font-family: 'Instrument Serif';
-  src: local('Helvetica Neue'), local('Arial');
+  src: url('latin/instrumentserif/InstrumentSerif-Italic.ttf') format('truetype');
   font-weight: 1 1000;
   font-style: italic;
   font-display: block;
 }
 @font-face {
   font-family: 'Instrument Serif';
-  src: local('Helvetica Neue'), local('Arial');
+  src: url('latin/instrumentserif/InstrumentSerif-Regular.ttf') format('truetype');
   font-weight: 1 1000;
   font-style: normal;
   font-display: block;
