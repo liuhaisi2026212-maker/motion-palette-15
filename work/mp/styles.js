@@ -22,7 +22,14 @@ export const STYLES = [
       { key: 'gold', label: '线条/文字色', type: 'color', tip: '原片是香槟金' }, { key: 'bg', label: '底色', type: 'color' },
     ],
     example: { brand: 'LIUYE STUDIO', tagline: '一笔成片', gold: '#9FE3D0', bg: '#101418' } },
-  { id: '03-isometric', name: '等轴 2.5D', en: 'Isometric', work: 'ISOPOLIS「让城市自己生长」' },
+  { id: '03-isometric', name: '等轴 2.5D', en: 'Isometric', work: 'ISOPOLIS「让城市自己生长」', ready: true,
+    about: '一块等轴网格地台上，城市一格格长出来：楼、风车、树、道路，弹出三张数据卡片，最后镜头拉远，立体大字和标语铺在地上。适合城市、平台、增长数据、产品生态。',
+    fields: [
+      { key: 'title', label: '立体大字', type: 'text', max: 12, tip: '只能英文字母和数字，会自动大写' },
+      { key: 'tagline', label: '中文标语', type: 'text', max: 9 }, { key: 'mono', label: '英文小字', type: 'text', max: 34 },
+      { key: 'callouts', label: '三张数据卡片', type: 'cards', n: 3, tip: '每张：中文名（4 字内）、英文名、数字、单位' },
+    ],
+    example: { title: 'LIUYE', tagline: '让灵感自己生长', mono: 'LIUYE OS · 365 IDEAS · ONLINE', callouts: [['选题命中', 'HIT RATE', 87.5, '%'], ['日更天数', 'STREAK', 120, '天'], ['粉丝增长', 'GROWTH', 3.6, '万']] } },
   { id: '04-3d-render', name: '3D 渲染', en: '3D Render', work: 'soft.「柔软着陆」' },
   { id: '05-cel-boil', name: '逐帧手绘', en: 'Frame-by-Frame', work: '手作 HAND MADE', ready: true,
     about: '手绘逐帧动画、线条一直在轻轻抖：火柴划着，跳出一个小火苗精灵，炸成烟花，再按真实笔顺写出大标题，最后拉远成一叠原画纸。适合有温度的品牌、手作、文创、知识栏目。',
@@ -168,6 +175,8 @@ export function cleanCfg(style, raw) {
     else if (f.type === 'color') { const s = String(v).trim(); if (/^#?[0-9a-fA-F]{6}$/.test(s)) out[f.key] = (s[0] === '#' ? s : '#' + s).toUpperCase(); else warn.push(`「${f.label}」${s} 不是 #RRGGBB 颜色，已忽略`); }
     else if (f.type === 'list') { const a = Array.isArray(v) ? v : String(v).split(/[,，、\s]+/); if (a.length !== f.n) warn.push(`「${f.label}」需要 ${f.n} 个，收到 ${a.length} 个`); out[f.key] = Array.from({ length: f.n }, (_, i) => cut(a[i] ?? '', f.max, f.label)); }
     else if (f.type === 'pairs') { const a = Array.isArray(v) ? v : []; out[f.key] = Array.from({ length: f.n }, (_, i) => { const p = Array.isArray(a[i]) ? a[i] : [a[i] ?? '', '']; return [cut(p[0], 8, f.label), cut(p[1], 1, f.label)]; }); }
+    else if (f.type === 'cards') { const a = Array.isArray(v) ? v : []; out[f.key] = Array.from({ length: f.n }, (_, i) => { const c = Array.isArray(a[i]) ? a[i] : [];
+      return [cut(c[0] ?? '', 6, f.label), cut(c[1] ?? '', 10, f.label), isFinite(+c[2]) ? +c[2] : 0, cut(c[3] ?? '', 6, f.label)]; }); }
     else if (f.type === 'ui') { const o = {}; for (const [k, lab, mx, n] of f.keys) { const x = v[k]; if (x == null) continue;
       o[k] = n ? Array.from({ length: n }, (_, i) => cut((Array.isArray(x) ? x : [x])[i] ?? '', mx, lab)) : cut(x, mx, lab); } out[f.key] = o; }
   }
@@ -178,7 +187,7 @@ export function cleanCfg(style, raw) {
 // 弱模型也能看懂的提示词：只让它写这一支片的配置
 export function promptFor(style) {
   const lines = (style.fields || []).map(f => {
-    const lim = f.type === 'text' ? `，最多 ${f.max} 个字` : f.type === 'list' ? `，正好 ${f.n} 个，每个最多 ${f.max} 个字` : f.type === 'pairs' ? `，正好 ${f.n} 组，每组 [英文词, 一个汉字]` : f.type === 'color' ? '，写 #RRGGBB 颜色' : '';
+    const lim = f.type === 'cards' ? `，正好 ${f.n} 张，每张写成 ["中文名", "英文名", 数字, "单位"]` : f.type === 'text' ? `，最多 ${f.max} 个字` : f.type === 'list' ? `，正好 ${f.n} 个，每个最多 ${f.max} 个字` : f.type === 'pairs' ? `，正好 ${f.n} 组，每组 [英文词, 一个汉字]` : f.type === 'color' ? '，写 #RRGGBB 颜色' : '';
     const sub = f.type === 'ui' ? '\n' + f.keys.map(([k, lab, mx, n]) => `    - ${k}：${lab}${n ? `，正好 ${n} 条` : ''}，每条最多 ${mx} 个字`).join('\n') : '';
     return `- ${f.key}：${f.label}${lim}${f.tip ? `（${f.tip}）` : ''}${sub}`; }).join('\n');
   return `你是品牌短片文案和配色设计师。我有一支做好的 10 秒「${style.name}」风格动画（原片：${style.work}），画面和动作都是固定的，你只需要帮我写一份配置，替换片子里的文字和颜色。

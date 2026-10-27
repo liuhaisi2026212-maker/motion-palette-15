@@ -142,6 +142,7 @@ function buildForm() {
     if (f.type === 'text') inner = `<input type="text" data-k="${f.key}" maxlength="${f.max * 2}">`;
     else if (f.type === 'list') inner = `<div class="multi">${Array.from({ length: f.n }, (_, i) => `<input type="text" data-k="${f.key}" data-i="${i}">`).join('')}</div>`;
     else if (f.type === 'pairs') inner = `<div class="multi">${Array.from({ length: f.n }, (_, i) => `<input type="text" data-k="${f.key}" data-i="${i}" data-j="0" placeholder="英文"><input type="text" data-k="${f.key}" data-i="${i}" data-j="1" placeholder="汉字">`).join('')}</div>`;
+    else if (f.type === 'cards') inner = Array.from({ length: f.n }, (_, i) => `<div class="multi" style="margin-bottom:6px">${['中文名', '英文名', '数字', '单位'].map((ph, j) => `<input type="text" data-k="${f.key}" data-i="${i}" data-j="${j}" placeholder="${ph}">`).join('')}</div>`).join('');
     else if (f.type === 'ui') inner = f.keys.map(([k, lab, mx, n]) => `<div class="f"><label>${lab}</label>${n ? `<div class="multi">${Array.from({ length: n }, (_, i) => `<input type="text" data-k="${f.key}" data-u="${k}" data-i="${i}">`).join('')}</div>` : `<input type="text" data-k="${f.key}" data-u="${k}">`}</div>`).join('');
     d.innerHTML = `<label>${f.label}</label>${inner}${f.tip ? `<div class="tip">${f.tip}</div>` : ''}`; box.appendChild(d);
   }
@@ -154,15 +155,16 @@ function readForm() { const o = {}; $('form').querySelectorAll('input').forEach(
     if (f.type === 'text') { if (v) o[k] = v; return; }
     if (f.type === 'list') { (o[k] ||= Array(f.n).fill(''))[+i.dataset.i] = v; return; }
     if (f.type === 'pairs') { (o[k] ||= Array.from({ length: f.n }, () => ['', '']))[+i.dataset.i][+i.dataset.j] = v; return; }
+    if (f.type === 'cards') { (o[k] ||= Array.from({ length: f.n }, () => ['', '', '', '']))[+i.dataset.i][+i.dataset.j] = v; return; }
     if (f.type === 'ui') { o[k] ||= {}; const u = i.dataset.u, n = f.keys.find(x => x[0] === u)[3]; if (n) (o[k][u] ||= Array(n).fill(''))[+i.dataset.i] = v; else if (v) o[k][u] = v; } });
-  for (const f of cur.fields) { if (f.type === 'list' && o[f.key]?.every(x => !x)) delete o[f.key]; if (f.type === 'pairs' && o[f.key]?.every(p => !p[0] && !p[1])) delete o[f.key];
+  for (const f of cur.fields) { if (f.type === 'cards' && o[f.key]?.every(c => c.every(x => !x))) delete o[f.key]; if (f.type === 'list' && o[f.key]?.every(x => !x)) delete o[f.key]; if (f.type === 'pairs' && o[f.key]?.every(p => !p[0] && !p[1])) delete o[f.key];
     if (f.type === 'ui' && o[f.key]) { for (const u in o[f.key]) if (Array.isArray(o[f.key][u]) && o[f.key][u].every(x => !x)) delete o[f.key][u]; } }
   return o; }
 function fillForm() { $('form').querySelectorAll('input').forEach(i => { const k = i.dataset.k, f = cur.fields.find(x => x.key === k), v = cfg[k];
   if (f.type === 'color') { i.value = v || '#888888'; i.oninput = () => i.dataset.touched = 1; return; }
   if (f.type === 'text') i.value = v || '';
   else if (f.type === 'list') i.value = v?.[+i.dataset.i] || '';
-  else if (f.type === 'pairs') i.value = v?.[+i.dataset.i]?.[+i.dataset.j] || '';
+  else if (f.type === 'pairs' || f.type === 'cards') i.value = v?.[+i.dataset.i]?.[+i.dataset.j] ?? '';
   else if (f.type === 'ui') { const u = v?.[i.dataset.u]; i.value = Array.isArray(u) ? u[+i.dataset.i] || '' : u || ''; } }); }
 let tm; const later = () => { clearTimeout(tm); tm = setTimeout(reload, 700); };
 
