@@ -94,7 +94,7 @@ import { STYLES, cleanCfg, promptFor } from './mp/styles.js';
 import { Muxer, ArrayBufferTarget } from './mp/mp4-muxer.js';
 const $ = id => document.getElementById(id);
 const film = $('film'), stage = $('stage');
-let cur = null, cfg = {}, T = 0, DUR = 10, FPS = 30, VW = 1920, VH = 1080, playing = false, last = 0, busy = false, loadTok = 0, audio = null;
+let cur = null, cfg = {}, T = 0, DUR = 10, FPS = 30, VW = 1920, VH = 1080, playing = false, last = 0, busy = false, loadTok = 0, audio = null, loaded = false;
 
 // ---------- 风格列表
 STYLES.forEach(s => { const b = document.createElement('button'); b.className = 'sty'; b.disabled = !s.ready; b.dataset.id = s.id;
@@ -104,16 +104,17 @@ const fit = () => { const k = stage.clientWidth / VW; film.style.transform = `sc
 new ResizeObserver(fit).observe(stage);
 
 // ---------- 加载一支片（每次改配置都重新加载 iframe，片子只在启动时读配置）
-function pick(id) { cur = STYLES.find(s => s.id === id); cfg = {}; [...$('styles').children].forEach(b => b.classList.toggle('on', b.dataset.id === id));
+function pick(id) { if (busy) return; cur = STYLES.find(s => s.id === id); cfg = {}; [...$('styles').children].forEach(b => b.classList.toggle('on', b.dataset.id === id));
   $('about').textContent = cur.about; buildForm(); syncJson(); reload(); }
 function reload() {
-  const tok = ++loadTok; setPlay(false);
+  if (busy) return;   // 导出中不重新加载片子
+  const tok = ++loadTok; setPlay(false); loaded = false; $('export').disabled = true;
   VW = cur.portrait ? 1080 : 1920; VH = cur.portrait ? 1920 : 1080; film.style.width = VW + 'px'; film.style.height = VH + 'px'; stage.classList.toggle('portrait', !!cur.portrait); fit(); $('veil').hidden = false; $('veil').textContent = '加载中…';
   film.src = `demos/${cur.id}/index.html?cfg=${encodeURIComponent(JSON.stringify(cfg))}`;
   audio = new Audio(`demos/${cur.id}/music.m4a`); audio.preload = 'auto';
   const t0 = performance.now();
   (function wait() { if (tok !== loadTok) return; const w = film.contentWindow;
-    if (w && w.__ready && w.renderAt) { DUR = w.DEMO?.duration || 10; FPS = w.DEMO?.fps || 30; $('veil').hidden = true; draw(); return; }
+    if (w && w.__ready && w.renderAt) { DUR = w.DEMO?.duration || 10; FPS = w.DEMO?.fps || 30; $('veil').hidden = true; loaded = true; $('export').disabled = false; draw(); return; }
     if (performance.now() - t0 > 30000) { $('veil').textContent = '加载失败：请确认是用「启动工作台」打开的，而不是直接双击网页'; return; }
     setTimeout(wait, 120); })();
 }
@@ -166,7 +167,7 @@ function fillForm() { $('form').querySelectorAll('input').forEach(i => { const k
   else if (f.type === 'list') i.value = v?.[+i.dataset.i] || '';
   else if (f.type === 'pairs' || f.type === 'cards') i.value = v?.[+i.dataset.i]?.[+i.dataset.j] ?? '';
   else if (f.type === 'ui') { const u = v?.[i.dataset.u]; i.value = Array.isArray(u) ? u[+i.dataset.i] || '' : u || ''; } }); }
-let tm; const later = () => { clearTimeout(tm); tm = setTimeout(reload, 700); };
+let tm; const later = () => { if (busy) return; clearTimeout(tm); tm = setTimeout(reload, 700); };
 
 // ---------- JSON（贴 AI 的回复）
 function syncJson() { if (document.activeElement !== $('jsonTA')) $('jsonTA').value = JSON.stringify(cfg, null, 2); }
@@ -214,7 +215,7 @@ async function frameSource(w) {
 async function pickCodec(w, h, fps) { for (const codec of ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.42003e']) { const c = { codec, width: w, height: h, bitrate: 14e6, framerate: fps };
   try { if ((await VideoEncoder.isConfigSupported(c)).supported) return c; } catch (e) {} } return null; }
 $('export').onclick = async () => {
-  if (busy || !cur) return; const msg = $('exmsg');
+  if (busy || !cur || !loaded) return; const msg = $('exmsg');
   if (!('VideoEncoder' in window)) { msg.className = 'msg err'; msg.textContent = '这个浏览器不支持导出。请用最新版 Chrome 或 Edge 打开。'; return; }
   busy = true; setPlay(false); $('export').disabled = true; $('bar').classList.add('on'); msg.className = 'msg'; msg.textContent = '正在导出，可以切到别的窗口，但不要关掉这个页面…';
   try {
@@ -252,7 +253,7 @@ $('export').onclick = async () => {
 };
 
 pick(STYLES.find(s => s.ready).id);
-window.__wb = { pick, setCfg: c => { cfg = cleanCfg(cur, c).cfg; fillForm(); syncJson(); reload(); }, get ready() { return $('veil').hidden; } };
+window.__wb = { pick, setCfg: c => { cfg = cleanCfg(cur, c).cfg; fillForm(); syncJson(); reload(); }, get ready() { return loaded; } };
 </script>
 </body>
 </html>

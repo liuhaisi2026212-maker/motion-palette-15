@@ -188,7 +188,7 @@ export function cleanCfg(style, raw) {
 export function promptFor(style) {
   const lines = (style.fields || []).map(f => {
     const lim = f.type === 'cards' ? `，正好 ${f.n} 张，每张写成 ["中文名", "英文名", 数字, "单位"]` : f.type === 'text' ? `，最多 ${f.max} 个字` : f.type === 'list' ? `，正好 ${f.n} 个，每个最多 ${f.max} 个字` : f.type === 'pairs' ? `，正好 ${f.n} 组，每组 [英文词, 一个汉字]` : f.type === 'color' ? '，写 #RRGGBB 颜色' : '';
-    const sub = f.type === 'ui' ? '\n' + f.keys.map(([k, lab, mx, n]) => `    - ${k}：${lab}${n ? `，正好 ${n} 条` : ''}，每条最多 ${mx} 个字`).join('\n') : '';
+    const sub = f.type === 'ui' ? '\n' + f.keys.map(([k, lab, mx, n]) => `    - ${k}：${lab}${n ? `，正好 ${n} 条，每条最多 ${mx} 个字` : `，最多 ${mx} 个字`}`).join('\n') : '';
     return `- ${f.key}：${f.label}${lim}${f.tip ? `（${f.tip}）` : ''}${sub}`; }).join('\n');
   return `你是品牌短片文案和配色设计师。我有一支做好的 10 秒「${style.name}」风格动画（原片：${style.work}），画面和动作都是固定的，你只需要帮我写一份配置，替换片子里的文字和颜色。
 
