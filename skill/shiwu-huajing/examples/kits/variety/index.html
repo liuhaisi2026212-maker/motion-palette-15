@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>综艺花字 · 十五画境参考例子</title>
+<style>
+@font-face { font-family: 'ZCOOL KuaiLe'; src: url('../../assets/fonts/ZCOOLKuaiLe-Regular.ttf') format('truetype'); font-display: block; }
+@font-face { font-family: 'LXGW Marker Gothic'; src: url('../../assets/fonts/LXGWMarkerGothic-Regular.ttf') format('truetype'); font-display: block; }
+html, body { margin: 0; background: #000; overflow: hidden; }
+canvas { display: block; width: 1080px; height: 1920px; }
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+import { boot, readSpec } from '../../lib/core.js';
+import { buildFilm } from './kit.js';
+import { EXAMPLE } from './example.js';
+const spec = readSpec(EXAMPLE), all = JSON.stringify(spec) + '（小声）点个关注不迷路';
+await boot({ width: 1080, height: 1920, fps: 30, fonts: [['100px "ZCOOL KuaiLe"', all], ['100px "LXGW Marker Gothic"', all], ['900 100px "PingFang SC"', all]] },
+  async () => buildFilm(spec, document.getElementById('c')));
+</script></body></html>

@@ -36,7 +36,7 @@ async function frame(q) {
 }
 
 http.createServer((q, r) => {
-  const u = new URL(q.url, 'http://x');
+  const u = new URL('http://x' + q.url);
   if (u.pathname === '/api/ping') { r.writeHead(200, { 'Content-Type': 'application/json' }); return r.end('{"frames":true}'); }
   if (u.pathname === '/api/frame') {
     queue = queue.then(() => frame(u.searchParams)).then(buf => { r.writeHead(200, { 'Content-Type': 'image/jpeg', 'Cache-Control': 'no-store' }); r.end(buf); },

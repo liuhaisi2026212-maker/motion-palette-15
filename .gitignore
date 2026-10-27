@@ -4,3 +4,4 @@ node_modules/
 *.mp4
 dist/
 样片/*.mp4
+package-lock.json

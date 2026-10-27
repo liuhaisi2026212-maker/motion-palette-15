@@ -1,0 +1,66 @@
+# 形变
+
+## 一眼认出它
+一个图形丝滑地、不间断地变成另一个图形：咖啡杯变太阳、太阳变海鸥、海鸥变纸飞机……轮廓从头到尾连续，没有跳变；每次变形都卡在节拍上，背景色块跟着换。
+
+## 适合 / 不适合
+适合：讲一段旅程或一个过程（一天、一个产品的使用流程、一个想法的诞生）、发布会动效、logo 演绎。不适合：信息密集的讲解。
+
+## 必备元素
+1. **轮廓连续**：形状 A → B 中间每一帧都是一个干净的形状，不打结、不翻面、不突然跳。
+2. **中介形状**：复杂的 A → B 先收成圆或胶囊，再展开成 B（「A → 圆 → B」，两段各 8～12 帧）。
+3. **形变同时带位移和旋转**，加 10%～15% 挤压拉伸，掩盖插值的机械感。
+4. **中段最快**：`cubic-bezier(0.7, 0, 0.3, 1)`，起止各留 3 帧缓冲。
+5. **背景色块跟着换**：每次形变落定，背景用色块擦除换一个颜色。
+6. **6～8 个有意义的形状串成一条故事链**，最后落到品牌 logo / 文字。
+
+## 配色
+- 暖日：奶油 `#F4EEE3`、墨 `#16151B`、金黄 `#FFB627`、朱红 `#FF4F2B`、群青 `#2438E8`
+- 清晨：雾白 `#EEF2F0`、深青 `#123C3A`、珊瑚 `#FF7A59`、天蓝 `#5DB7DE`、柠檬 `#F5E663`
+
+## 技术路线
+Canvas 2D。关键：**所有形状都重采样成同样数量的点（比如 128 个），并且起点对齐**，然后逐点插值。
+
+```js
+// 把任意形状（点列表）重采样成 n 个等距点，起点放在最上方（角度 -90° 附近），保证插值时不打结
+function resample(pts, n = 128) {
+  const L = [0]; for (let i = 1; i <= pts.length; i++) { const a = pts[i - 1], b = pts[i % pts.length]; L.push(L[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
+  const total = L[L.length - 1], out = [];
+  for (let k = 0; k < n; k++) { const d = total * k / n; let i = 1; while (L[i] < d) i++; const a = pts[i - 1], b = pts[i % pts.length], f = (d - L[i - 1]) / (L[i] - L[i - 1] || 1); out.push([lerp(a[0], b[0], f), lerp(a[1], b[1], f)]); }
+  // 起点对齐：找最上面的点作为第 0 个
+  let top = 0; out.forEach((p, i) => { if (p[1] < out[top][1]) top = i; }); return out.slice(top).concat(out.slice(0, top));
+}
+// 方向也要一致（都顺时针）：用面积正负判断，反了就 reverse()
+const area = pts => pts.reduce((s, p, i) => { const q = pts[(i + 1) % pts.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0) / 2;
+// 插值 + 画
+function morphDraw(ctx, A, B, u, fill) { ctx.beginPath(); A.forEach((p, i) => { const x = lerp(p[0], B[i][0], u), y = lerp(p[1], B[i][1], u); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); }
+```
+
+形状怎么来：用 `Path2D` 或手写点（圆、心形公式、星形），文字轮廓可以用 opentype.js 读字体得到路径再采样。有洞的形状（比如字母 o）：外轮廓做形变，洞单独做一个从 0 长出来的小形状。
+
+## 最小可行做法（一般模型）
+1. 选 4 个简单形状：圆、心形、星形、圆角方块（都能用公式生成点）。
+2. 都用 `resample` 变成 128 个点。
+3. 每 1.2 秒形变一次，形变时整个形状绕中心转 30°、`scaleX/Y` 做 10% 挤压拉伸，背景色从左到右擦除成下一个颜色。
+4. 最后一个形状收成一个圆点，变成品牌名旁边的句号。
+
+```js
+const heart = Array.from({ length: 200 }, (_, i) => { const a = i / 200 * Math.PI * 2; return [16 * Math.sin(a) ** 3 * 14, -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a)) * 14]; });
+const circleP = Array.from({ length: 200 }, (_, i) => { const a = i / 200 * Math.PI * 2; return [Math.cos(a) * 220, Math.sin(a) * 220]; });
+```
+
+## 进阶做法（强模型）
+- 子部件同步形变：杯子的热气 → 太阳光芒 → 海浪，主体和部件一起变。
+- 文字落版：每个字母先是一个圆环 + 胶囊（字的基本部件），再变成真正的字形轮廓。
+- 用 flubber 之类的库（或自己做最优旋转对齐）处理顶点匹配。
+
+## 常见做砸
+- 打结、翻面：点数不同、起点不对、方向不一致。
+- 原地变形，没有位移和旋转，像幻灯片。
+- 变形太快看不清、太慢没节奏（每次 0.5～0.8 秒合适）。
+
+## 配乐
+节奏感强的拨弦琶音；每次形变一个有音高的 whoosh，落在拍子上。
+
+## 参考
+`examples/kits/flat/kit.js` 里的转场（方块放大成下一场底色）可以和形变结合。

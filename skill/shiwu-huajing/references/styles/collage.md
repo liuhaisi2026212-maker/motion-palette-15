@@ -1,0 +1,59 @@
+# 拼贴剪贴
+
+## 一眼认出它
+把老照片、旧报纸、手撕纸片剪下来重新拼：人物照片带一圈剪刀剪出来的白边，有半调网点（印刷小圆点），比例故意失调（大头、头顶打开飞出东西），动作一顿一顿像定格动画，红黑斜排的大字。
+
+## 适合 / 不适合
+适合：脑洞、创意、杂志栏目、潮流、音乐、观点类内容。不适合：严肃的数据讲解。
+
+## 必备元素
+1. **剪纸白边**：照片抠出来后加 2～4px（1080p 下可到 8～12px）白描边 + 一点投影，像真剪下来贴上去。
+2. **半调网点**：照片或色块上有印刷网点纹理。
+3. **纸质底**：牛皮纸、旧报纸、撕纸边。
+4. **定格感**：运动 12fps 甚至 6fps，位置每次加 ±2px 随机抖动，像手摆的。
+5. **超现实拼装**：东西从不该出现的地方冒出来（头顶打开、嘴里飞出、手把东西拍上来）。
+6. **构成主义字**：红黑斜条 + 粗压缩字体（Anton、Bebas Neue、站酷高端黑），可以用「勒索信」式拼贴字（每个字一块不同的纸）。
+
+## 配色
+- 牛皮纸 `#C9A57A`、报纸 `#EFE8DA`、红 `#D7262C`、黑 `#16130F`、点缀芥末黄 `#E3B23C`
+- 灰纸 `#D9D4C7`、墨绿 `#1F4D3A`、橙 `#F06A2A`、黑 `#111`
+
+## 素材
+需要图片：用户自己的照片，或公有领域 / CC0 图片（旧版画、老照片、NASA 太空图、植物插画）。抠图可以用 rembg（Python）或者直接画矩形剪贴。**不要用有版权的照片。**
+
+## 技术路线
+Canvas 2D。
+
+```js
+// 剪纸：先在离屏把抠好的图加白边（多方向偏移画一圈白色剪影），再贴到主画布并加投影
+function cutout(img, edge = 10) {
+  const c = document.createElement('canvas'); c.width = img.width + edge * 2; c.height = img.height + edge * 2; const x = c.getContext('2d');
+  for (let a = 0; a < 16; a++) x.drawImage(img, edge + Math.cos(a / 16 * Math.PI * 2) * edge, edge + Math.sin(a / 16 * Math.PI * 2) * edge);
+  x.globalCompositeOperation = 'source-in'; x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);   // 剪影变白=白边
+  x.globalCompositeOperation = 'source-over'; x.drawImage(img, edge, edge); return c;
+}
+// 半调网点：在一张小画布上画圆点做成 pattern，multiply 叠到图上
+// 手撕纸边：矩形的边用一串随机起伏的点代替直线
+function tornRect(ctx, x, y, w, h, seed, fill) { const r = rng(seed); ctx.beginPath(); ctx.moveTo(x, y); for (let i = 0; i <= 20; i++) ctx.lineTo(x + w * i / 20, y + (r() - .5) * 8); for (let i = 0; i <= 10; i++) ctx.lineTo(x + w + (r() - .5) * 8, y + h * i / 10); for (let i = 20; i >= 0; i--) ctx.lineTo(x + w * i / 20, y + h + (r() - .5) * 8); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); }
+// 定格抖动：位置 = 目标位置 + 按 6fps 帧号的随机偏移
+const jit = (t, i) => { const r = rng(Math.floor(t * 6) * 31 + i); return [(r() - .5) * 4, (r() - .5) * 4, (r() - .5) * .02]; };
+```
+
+## 最小可行做法（一般模型）
+1. 牛皮纸底 + 颗粒 + 几张撕纸色块（`tornRect`）斜着铺。
+2. 用户给的照片做成剪纸（`cutout`），加投影，定格抖动地「拍」进画面（第一帧放大 1.2 倍、第二帧 1.0，像被手拍上来）。
+3. 一条红色斜条（旋转 -8°）上写粗压缩大字，逐字一块块拍上来（每个字一个不同颜色的纸片底）。
+4. 全片运动用 `Math.floor(t * 12) / 12` 量化。
+
+## 进阶做法（强模型）
+- 人物关节拆块（头、下巴、手臂），绕锚点做木偶式旋转；嘴巴用 2～3 张替换帧开合。
+- 头顶像盖子一样掀开，里面是太空图，飞出星球、火箭、花鸟（每个都是剪纸）。
+- 胶带、剪刀沿虚线剪开的动画、翻页转场。
+
+## 常见做砸
+- 运动太顺滑（要定格感）。
+- 白边太细或没有投影，像贴图不像剪纸。
+- 素材来源不明或有版权。
+
+## 配乐
+黑胶底噪 + 爵士 boom-bap 鼓；纸张摩擦、剪刀咔嚓、拍桌、卡通「啵」。

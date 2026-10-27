@@ -1,5 +1,7 @@
 # 十五画境 · Motion Palette 15（v0.3）
 
+> **现在的主线是 `skill/shiwu-huajing/`**：一本给 AI 看的 MG 动画手艺书（15 种风格门道 + 脚手架 + 参考作品），装法见 [skill/shiwu-huajing/README.md](skill/shiwu-huajing/README.md)。下面的模板版 / 创作版是历史版本。
+
 15 种 MG 动画风格的**模板版** skill。每种风格是一支做好的 10 秒高质量短片（来自开源项目 [mg-styles-15](https://github.com/Vincentwei1021/mg-styles-15)，MIT），文字和配色抽成了配置。用任何 AI（包括豆包、DeepSeek）写一份配置，或者直接在网页表单里填，就能导出带配乐的 MP4。
 
 **现状：15 支里 14 支可用**（04 3D 渲染要 Blender，暂不支持）。详见 [进度记录.md](进度记录.md)。

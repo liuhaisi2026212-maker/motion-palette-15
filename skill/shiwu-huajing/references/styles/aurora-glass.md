@@ -1,0 +1,66 @@
+# 弥散玻璃（极光 + 磨砂玻璃）
+
+## 一眼认出它
+深色底上几大团模糊的彩色光斑在慢慢漂，上面浮着几张半透明的磨砂玻璃卡片（白色细边、大圆角），卡片里是简洁的界面（对话、开关、波形）。一切都很慢、很轻、很「贵」。2024～2026 年 AI 产品发布片的标配。
+
+## 适合 / 不适合
+适合：AI 产品、App、科技品牌、发布会、高级感片头。不适合：热闹、搞笑、需要强冲击的内容。
+
+## 必备元素
+1. **极光底**：3～5 个纯色大圆，模糊 80～150px，沿慢速曲线漂移（一圈 20～40 秒），互相融成网格渐变。
+2. **邻近色**：紫-蓝-青，或橙-粉-红，2～3 个相邻色相；撞色会脏。
+3. **磨砂玻璃卡片**：背后的光斑透过来变模糊（20～40px），白色 5%～10% 填充，1px 白色 30% 内描边，大圆角（24～40px）。
+4. **很慢**：只用正弦呼吸和 `outExpo` 长尾缓动；文字入场只用透明度 + 8px 上移。
+5. **3%～5% 噪点**防色带。
+6. **轻细的字**：细到中等粗细的无衬线字（Inter、Sora、思源黑体 Light）。
+
+## 配色
+- 极光：底 `#05041A`，光斑 紫 `#7050FF`、蓝 `#2F46F2`、青 `#34CFF0`、品红 `#B653F0`
+- 暖光：底 `#120408`，光斑 橙 `#FF6A3D`、粉 `#FF3D9A`、金 `#FFC93C`、酒红 `#7A1F3D`
+
+## 技术路线
+Canvas 2D 可以做出 80% 的效果：
+
+```js
+// 极光：大圆用径向渐变画（比 blur 快），沿缓慢的利萨如曲线漂移
+function aurora(ctx, W, H, t, blobs) {
+  ctx.fillStyle = '#05041A'; ctx.fillRect(0, 0, W, H); ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  for (const b of blobs) { const x = b.x + Math.sin(t * .12 + b.p) * 180, y = b.y + Math.cos(t * .09 + b.p * 1.7) * 120, g = ctx.createRadialGradient(x, y, 0, x, y, b.r);
+    g.addColorStop(0, b.c + 'CC'); g.addColorStop(1, b.c + '00'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+  ctx.restore();
+}
+// 玻璃卡片：把当前画面（已经画好的极光）在卡片区域内模糊一遍再盖回去
+function glassCard(ctx, x, y, w, h, r = 32) {
+  ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.clip();
+  ctx.filter = 'blur(28px)'; ctx.drawImage(ctx.canvas, 0, 0); ctx.filter = 'none';          // 背后模糊
+  ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fillRect(x, y, w, h); ctx.restore();
+  ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.32)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.roundRect(x + .75, y + .75, w - 1.5, h - 1.5, r); ctx.stroke(); ctx.restore();
+}
+```
+
+（注意：`ctx.drawImage(ctx.canvas)` 画自己在 Chrome 可以；如果有问题，先拷到离屏画布再画回来。）
+
+强模型：WebGL 着色器做网格渐变 + 真折射的「液态玻璃」镜头（边缘色散、高光）。
+
+## 最小可行做法（一般模型）
+1. 极光底（4 个光斑，`aurora`）。
+2. 2～3 张玻璃卡片从下方 30px 慢慢浮上来（`outExpo`，0.8 秒），错峰 0.2 秒；卡片里放一句对话（左边头像圆点 + 文字）、一个开关、一排声波竖条（高度按 `sin` 呼吸）。
+3. 卡片散开（向四周慢慢漂出画面），中间出现品牌名（细字、字距加宽），下面一行小字标语。
+4. 颗粒 4%。
+
+## 进阶做法（强模型）
+- 卡片轻微 3D 倾斜（视差：近的卡片动得多）。
+- 一个液态玻璃镜头（圆角胶囊）滑过画面，放大并折射后面的极光和卡片，边缘有彩虹色散。
+- 打字机效果的 AI 回复，光标闪烁。
+
+## 常见做砸
+- 动得太快（这个风格的大忌）。
+- 光斑颜色撞色、太多，变脏。
+- 卡片太白太实，不像玻璃；或者没有那条 1px 的白边。
+- 色带（没加噪点）。
+
+## 配乐
+环境氛围 pad、轻微的 shimmer 闪光音、非常轻的界面点击声。
+
+## 参考
+`examples/` 暂无完整玻璃例子，按上面的最小可行做法写即可。
