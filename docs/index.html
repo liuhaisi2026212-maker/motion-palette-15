@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>十五画境 · 15 种 MG 动画风格样片</title>
+<meta name="description" content="十五画境：给 AI 看的 MG 动画手艺书。15 种动态设计风格，各一支用代码做的原创样片，带声音在线观看。">
+<style>
+  :root { --bg: #0f0f12; --card: #18181d; --line: #2a2a31; --text: #ecebe6; --dim: #9a99a3; --accent: #ff8a3d; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.7 "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 56px 0 28px; }
+  h1 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 44px); letter-spacing: .02em; }
+  .lead { margin: 0; color: var(--dim); font-size: 17px; max-width: 760px; }
+  .lead b { color: var(--text); font-weight: 600; }
+  .actions { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; color: var(--text); background: var(--card); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #1a1006; font-weight: 600; }
+  .btn:hover { text-decoration: none; filter: brightness(1.1); }
+  .reel { margin: 8px 0 40px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+  .reel video { display: block; width: 100%; aspect-ratio: 16 / 9; }
+  h2 { font-size: 20px; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+  .film { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .film video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; object-fit: contain; }
+  .meta { padding: 12px 14px 14px; }
+  .meta .no { color: var(--dim); font-size: 12px; letter-spacing: .1em; }
+  .meta h3 { margin: 2px 0 2px; font-size: 17px; }
+  .meta p { margin: 0 0 8px; color: var(--dim); font-size: 14px; }
+  .meta .links { font-size: 13px; display: flex; gap: 14px; }
+  footer { margin: 56px 0 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>十五画境 · 15 种 MG 动画风格</h1>
+    <p class="lead">一本给 AI 看的 MG 动画手艺书。下面 15 支样片都是 AI 照着 skill 里的风格卡<b>用代码写出来的</b>：画面、动画、配乐全是代码，没有用生图或生视频模型。点开有声音。</p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/liuhaisi2026212-maker/motion-palette-15">GitHub 仓库 · 安装方法</a>
+      <a class="btn" href="https://github.com/liuhaisi2026212-maker/motion-palette-15/releases">下载原画质视频</a>
+    </div>
+  </header>
+
+  <h2>45 秒总览</h2>
+  <div class="reel"><video src="videos/00.mp4" poster="readme/cover.webp" controls playsinline preload="none"></video></div>
+
+  <h2>15 支样片</h2>
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    风格卡对照开源项目 <a href="https://github.com/Vincentwei1021/mg-styles-15">mg-styles-15</a>（MIT）学习写成，样片内容均为原创。本项目 MIT 许可，来源见仓库 NOTICE.md。
+  </footer>
+</div>
+<script>
+  const REPO = 'https://github.com/liuhaisi2026212-maker/motion-palette-15/blob/main/skills/shiwu-huajing/';
+  const FILMS = [
+    ['赛博 HUD', '寻猫雷达', '指挥舱屏幕铺满信息，只有一个焦点，全部为「锁定」那一下蓄力', 'hud', 'hud-寻猫雷达'],
+    ['综艺花字（竖屏）', '周一早上', '贴纸描边大字、放射背景、表情包式吐槽', 'variety-captions', 'variety-周一早上'],
+    ['包豪斯', '形意周', '几何色块出血、印刷标记、图案爆发', 'bauhaus', 'bauhaus-形意周'],
+    ['扁平矢量', '早一点', '无描边色块，一个小橙点串起所有转场', 'flat-vector', 'flat-vector-早一点'],
+    ['线条一笔画', '山间茶事', '一根线不断开，画出一整个故事', 'line-art', 'line-art-山间茶事'],
+    ['等轴 2.5D', '一亩田', '沙盘升起、白模生长、颜色从中心铺开', 'isometric', 'isometric-一亩田'],
+    ['3D 软萌', '泡芙工作室', '充气字落地回弹、珠子地面起波纹', '3d-render', '3d-render-泡芙工作室'],
+    ['逐帧手绘', '米米手作', '每两帧抖一次的线条、一笔一笔写出的字', 'cel-boil', 'cel-boil-米米手作'],
+    ['拼贴', '漫游周刊', '网点剪报、沿虚线剪开、撕纸转场', 'collage', 'collage-漫游周刊'],
+    ['液态', '啵啵果饮', '水滴溅开、分裂、融合成果冻字', 'liquid', 'liquid-啵啵果饮'],
+    ['形变', 'nova.', '点变线、线变圈、圈变字母', 'morph', 'morph-nova'],
+    ['复古霓虹 VHS', '深夜电台', '录像带界面、霓虹网格、条纹太阳、铬金大字', 'synthwave', 'synthwave-深夜电台'],
+    ['弥散玻璃', 'Muse', '层叠毛玻璃卡片、液态玻璃胶囊放大', 'aurora-glass', 'aurora-glass-Muse'],
+    ['知识科普贴纸', '一杯奶茶多少糖', '粗标题、数据逐格填满、画中画结论', 'sticker-explainer', 'sticker-explainer-奶茶多少糖'],
+    ['像素风', '厨房闯关记', '游戏 HUD、对话框、宝箱、昼夜变化', 'pixel', 'pixel-厨房闯关记'],
+  ];
+  const grid = document.getElementById('grid');
+  FILMS.forEach(([style, topic, line, card, film], i) => {
+    const n = String(i + 1).padStart(2, '0');
+    const el = document.createElement('article');
+    el.className = 'film';
+    el.innerHTML = `<video src="videos/${n}.mp4" poster="readme/films/${n}.webp" controls playsinline preload="none"></video>
+      <div class="meta"><div class="no">${n}</div><h3>${style} · ${topic}</h3><p>${line}</p>
+      <div class="links"><a href="${REPO}references/styles/${card}.md">风格卡</a><a href="${REPO}examples/films/${encodeURIComponent(film)}">源码</a></div></div>`;
+    grid.appendChild(el);
+  });
+  // 同一时间只放一支，开声音时不打架
+  document.addEventListener('play', e => document.querySelectorAll('video').forEach(v => v !== e.target && v.pause()), true);
+</script>
+</body>
+</html>

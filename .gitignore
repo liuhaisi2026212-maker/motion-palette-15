@@ -5,3 +5,4 @@ node_modules/
 dist/
 样片/*.mp4
 package-lock.json
+!docs/videos/*.mp4

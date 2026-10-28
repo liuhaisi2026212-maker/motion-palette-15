@@ -1,6 +1,6 @@
 # 手艺书版样片源码
 
-三支样片都是按 skill/shiwu-huajing 的流程从头写的，只改了 starter 里的 film.js（综艺花字另外在 film.html 里声明了两款开源字体）。
+三支样片都是按 skills/shiwu-huajing 的流程从头写的，只改了 starter 里的 film.js（综艺花字另外在 film.html 里声明了两款开源字体）。
 把对应的 film.js、film.html 拷进一份 starter 就能预览、导出。
 
 | 样片 | 风格卡 | 时长 |

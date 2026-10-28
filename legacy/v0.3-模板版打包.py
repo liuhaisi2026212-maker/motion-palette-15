@@ -1,12 +1,12 @@
 """十五画境 v0.3 打包：把 work/ 里给用户用的部分复制到 dist/motion-palette-15/，装好本地服务要用的 puppeteer-core，打成 zip。
-用法：python3 打包.py
+用法：python3 legacy/v0.3-模板版打包.py（历史版本，已不再维护）
 """
 import json, os, shutil, subprocess, zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-SRC, DIST = ROOT / 'work', ROOT / 'dist' / 'motion-palette-15'
-KEEP = ['index.html', 'SKILL.md', '使用说明.md', 'CREDITS.md', 'LICENSE', '启动工作台.command', '启动工作台.bat', 'mp', 'demos', 'assets', 'vendor', 'covers', 'harness']
+ROOT = Path(__file__).resolve().parent.parent
+SRC, DIST = ROOT / 'legacy' / 'v0.3-模板版', ROOT / 'dist' / 'motion-palette-15'
+KEEP = ['index.html', '旧版-SKILL.md', '使用说明.md', 'CREDITS.md', 'LICENSE', '启动工作台.command', '启动工作台.bat', 'mp', 'demos', 'assets', 'vendor', 'covers', 'harness']
 SKIP_DIRS = {'out', 'tools', 'work', '__pycache__', 'node_modules'}
 SKIP_FILES = ('.orig.html', '.orig.js', 'audio.py', '.DS_Store', 'prep.py', 'prep_r2.py', 'prep_r2b.py')
 
