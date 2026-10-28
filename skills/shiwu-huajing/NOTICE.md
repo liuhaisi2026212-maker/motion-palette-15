@@ -8,6 +8,18 @@
 
 15 张风格卡是对照开源项目 **mg-styles-15**（https://github.com/Vincentwei1021/mg-styles-15 ，作者 Vincentwei1021，MIT 许可）的 15 支样片学出来的：我们总结了每种风格的版式、零件、节奏和质感，用自己的话写成卡片，样片的内容（主题、文案、角色、构图、配乐）是重新做的。MIT 许可原文见 `licenses/mg-styles-15.MIT.txt`。
 
+## 参考了这些项目的做法
+
+`references/07-动画手艺进阶.md`、`references/08-单风格与合集.md` 和 `starter/lib/` 里的动画手法、参数，参考了下面这些开源项目公开的经验。我们按自己的理解重写，没有复制它们的代码：
+
+| 项目 | 学了什么 | 许可 |
+|---|---|---|
+| LottieFiles/motion-design-skill（https://github.com/LottieFiles/motion-design-skill） | 三层动、时长按距离、离场比进场短、反向动作、三分之一规则、动效性格和材质表 | MIT |
+| HyperFrames（https://github.com/heygen-com/hyperframes） | 动态模糊的采样方式和适用边界、慢快慢平移、转场即退场、按叙事位置和能量选转场 | Apache-2.0 |
+| Remotion（https://github.com/remotion-dev/remotion） | 感知缩放、推切转场的参数、转场与覆盖层分开 | Remotion License |
+| Motion Canvas（https://github.com/motion-canvas/motion-canvas） | 7 组弹簧预设的数值（`SPRINGS`）、放大钻入转场的缓动 | MIT |
+| Orkas VideoStudio（https://github.com/Orkas-AI/Orkas-VideoStudio） | 幻灯片风险关卡、第一帧当封面、反差 4.5 : 1、音效比画面早 10～20 毫秒 | MIT |
+
 ## 第三方文件
 
 | 位置 | 来源 | 许可 |

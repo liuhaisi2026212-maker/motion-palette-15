@@ -75,3 +75,64 @@ export function revealClip(ctx, kind, u, o = {}) {
   ctx.clip();
 }
 
+
+// ---------- 慢快慢平移 ----------
+// 整组东西挪位置（一排字、一叠卡片让位）用它。任何一条现成缓动都会「啪」地撞停，所以拆成三段：
+//   起步 20% 时间走 10% 路（加速）→ 冲刺 18% 时间走 65% 路（匀速）→ 收尾 62% 时间走 25% 路（强减速）
+// 返回 0→1 的进度。新内容在冲刺那一段（进度 0.1～0.75）出现，最自然。
+export function nudge(t, t0, dur) {
+  const u = clamp((t - t0) / dur);
+  if (u < .2) return .1 * (u / .2) ** 3;
+  if (u < .38) return .1 + .65 * (u - .2) / .18;
+  return .75 + .25 * (1 - (1 - (u - .38) / .62) ** 5);
+}
+
+// ---------- 感知缩放 ----------
+// 放大动画按倍数匀速变，越大看起来越慢；按面积匀速变，眼睛才觉得匀速。
+// 用法：const s = pscale(0.2, 1, E.outC(u))
+export const pscale = (s0, s1, u) => { const a = Math.sign(s0) * s0 * s0, b = Math.sign(s1) * s1 * s1, v = a + (b - a) * u; return Math.sign(v) * Math.sqrt(Math.abs(v)); };
+
+// ---------- 物理弹簧 ----------
+// 按质量 / 刚度 / 阻尼 / 初速度算 t 秒后的位置（0→1）。下面的预设取自 Motion Canvas，已经调好手感。
+// 用法：const k = springTo(t - t0, SPRINGS.plop)
+export const SPRINGS = {
+  plop: { mass: .2, stiffness: 20, damping: .68, v0: 0 },       // 弹出
+  bounce: { mass: .08, stiffness: 4.75, damping: .05, v0: 0 },   // 一直弹
+  swing: { mass: .39, stiffness: 19.85, damping: 2.82, v0: 0 },  // 摆
+  jump: { mass: .04, stiffness: 10, damping: .7, v0: 8 },        // 起跳（先冲出去）
+  strike: { mass: .03, stiffness: 20, damping: .9, v0: 4.8 },    // 敲击
+  smooth: { mass: .16, stiffness: 15.35, damping: 1.88, v0: 0 }, // 顺滑，几乎不弹
+  beat: { mass: .13, stiffness: 5.7, damping: 1.2, v0: 10 },     // 卡拍子的一下
+};
+export function springTo(t, { mass = 1, stiffness = 100, damping = 10, v0 = 0 } = {}) {
+  if (t <= 0) return 0;
+  const w0 = Math.sqrt(stiffness / mass), z = damping / (2 * Math.sqrt(stiffness * mass));
+  if (z < 1) { const a = z * w0, wd = w0 * Math.sqrt(1 - z * z); return 1 + Math.exp(-a * t) * (-Math.cos(wd * t) + (v0 - a) / wd * Math.sin(wd * t)); }
+  if (z === 1) return 1 + Math.exp(-w0 * t) * (-1 + (v0 - w0) * t);
+  const q = w0 * Math.sqrt(z * z - 1), r1 = -w0 * z + q, r2 = -w0 * z - q, c1 = (v0 + r2) / (r1 - r2);
+  return 1 + c1 * Math.exp(r1 * t) + (-1 - c1) * Math.exp(r2 * t);
+}
+
+// ---------- 单个元素的动态模糊 ----------
+// 只给快动作用：每帧移动超过自身宽度的猛冲、甩出、急停、快速放大旋转。一支片子 1～3 处。
+// 慢漂、呼吸、淡入淡出不要模糊（会显得糊、廉价）；字只模糊飞来的过程，落地那一刻必须清楚。
+// blur(ctx, t, fps, (c, tt) => 画这个元素在 tt 时刻的样子, { samples: 16, frames: 2, box: [x, y, w, h] })
+// 原理：在「上一帧 → 下一帧」之间均匀取 samples 个时刻各画一次，按透明度正确平均。box 给出元素可能出现的范围，越小越快。
+let _mb = null;
+export function blur(ctx, t, fps, draw, { samples = 16, frames = 2, box = null } = {}) {
+  const W = ctx.canvas.width, H = ctx.canvas.height, [bx, by, bw, bh] = box ? box.map(Math.round) : [0, 0, W, H];
+  if (!_mb || _mb.width !== bw || _mb.height !== bh) { _mb = document.createElement('canvas'); _mb.width = bw; _mb.height = bh; }
+  const m = _mb.getContext('2d', { willReadFrequently: true }), acc = new Float32Array(bw * bh * 4), span = frames / fps;
+  const T = ctx.getTransform();
+  for (let i = 0; i < samples; i++) {
+    m.setTransform(1, 0, 0, 1, 0, 0); m.clearRect(0, 0, bw, bh); m.setTransform(T.a, T.b, T.c, T.d, T.e - bx, T.f - by);
+    m.save(); draw(m, t + ((i + .5) / samples - .5) * span); m.restore();
+    const d = m.getImageData(0, 0, bw, bh).data;
+    for (let k = 0; k < d.length; k += 4) { const a = d[k + 3] / 255; acc[k] += d[k] * a; acc[k + 1] += d[k + 1] * a; acc[k + 2] += d[k + 2] * a; acc[k + 3] += d[k + 3]; }
+  }
+  const img = m.createImageData(bw, bh);
+  for (let k = 0; k < acc.length; k += 4) { const a = acc[k + 3] / samples, w = a / 255; img.data[k + 3] = a;
+    if (w > 0) { img.data[k] = acc[k] / samples / w; img.data[k + 1] = acc[k + 1] / samples / w; img.data[k + 2] = acc[k + 2] / samples / w; } }
+  m.setTransform(1, 0, 0, 1, 0, 0); m.putImageData(img, 0, 0);
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(_mb, bx, by); ctx.restore();
+}

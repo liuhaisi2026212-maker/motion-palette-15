@@ -27,7 +27,7 @@ const res = await pg.evaluate(async (times) => {
   let audio = null;
   if (window.MP_AUDIO) { const a = await window.MP_AUDIO(), { loudness } = await import('./lib/core.js'); let pk = 0; for (let i = 0; i < a.left.length; i++) pk = Math.max(pk, Math.abs(a.left[i]), Math.abs(a.right[i]));
     audio = { lufs: a.lufs ?? loudness(a.left, a.right), peak: 20 * Math.log10(pk || 1e-9) }; }
-  return { frames: out, beats: window.__BEATS || [], audio };
+  return { frames: out, beats: window.__BEATS || [], cuts: window.__CUTS || null, blurWindows: (window.DEMO.motionBlur && window.DEMO.motionBlur.windows || []).length, audio };
 }, times);
 
 // ---------- 文字问题 ----------
@@ -47,8 +47,9 @@ for (const f of res.frames) {
     const e = eff(x.size), s = x.s.trim(); if (!s) continue;
     if (e < 12 && meaningful(s)) add('small', s, f.t, x, `手机上约 ${e.toFixed(0)} 点（画布 ${x.size.toFixed(0)}px）`);
     if (x.contrast != null && e >= 10) {
-      if (x.contrast < 3) add('contrast', s, f.t, x, `反差 ${x.contrast.toFixed(1)} : 1`);
-      else if (x.busy > .08 && x.contrast < 4.5) add('contrast', s, f.t, x, `背景很花，反差只有 ${x.contrast.toFixed(1)} : 1`);
+      // 及格线：大字（手机上 ≥ 24 点）3 : 1，其余 4.5 : 1；背景很花时一律要 4.5 : 1
+      const need = e >= 24 && x.busy <= .08 ? 3 : 4.5;
+      if (x.contrast < need) add('contrast', s, f.t, x, `反差 ${x.contrast.toFixed(1)} : 1，要 ${need} : 1${x.busy > .08 ? '（背景很花）' : ''}`);
     }
     if (x.x0 < -2 || x.y0 < -2 || x.x1 > W + 2 || x.y1 > H + 2) { if (e >= 12) add('out', s, f.t, x); }
     if (vertical && e >= 12 && (meaningful(s) || e >= 16)) {
@@ -73,11 +74,21 @@ const diff = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0) / a.leng
 const sd = g => { const m = g.reduce((a, b) => a + b, 0) / g.length; return Math.sqrt(g.reduce((a, b) => a + (b - m) ** 2, 0) / g.length); };
 const f0 = res.frames[0], f1 = res.frames.find(f => f.t >= .3) || f0;
 if (sd(f0.g) < 4 && sd(f1.g) < 4) other.push('开头 0.3 秒还是空屏（几乎纯色）。第一帧就要有主体或文字，观众才不会划走。');
+// 第一帧就是封面：要有一句够大的字（手机上 ≥ 20 点）
+const tips = [];   // 建议：不算硬问题，但值得改
+if (!f0.texts.some(x => eff(x.size) >= 20 && x.alpha > .6)) tips.push('第一帧没有大字。第一帧就是封面（平台缩略图、观众划到时看到的样子），要放一句能读出「这条讲什么」的大字和主体，别用动画还没开始时的空样子。');
+// 幻灯片风险：死画面占比
+let stillTime = 0; for (let i = 1; i < res.frames.length; i++) if (diff(res.frames[i].g, res.frames[i - 1].g) < .6) stillTime += res.frames[i].t - res.frames[i - 1].t;
+const deadRatio = stillTime / demo.duration;
 let st = null;
 for (let i = 1; i < res.frames.length; i++) { const still = diff(res.frames[i].g, res.frames[i - 1].g) < .6;
   if (still && st == null) st = res.frames[i - 1].t; if ((!still || i === res.frames.length - 1) && st != null) { const end = res.frames[still ? i : i - 1].t; if (end - st >= 1.5 && end < demo.duration - 1.3) other.push(`${st.toFixed(1)}–${end.toFixed(1)} 秒画面几乎完全不动（${(end - st).toFixed(1)} 秒）。停住的画面也要有微动：慢推镜头、呼吸、漂浮（lib/motion.js 的 camera / idle）。`); st = null; } }
 for (const list of res.beats) { if (list.length < 5) continue; const d = list.map(x => x[1]), m = d.reduce((a, b) => a + b, 0) / d.length, cv = Math.sqrt(d.reduce((a, b) => a + (b - m) ** 2, 0) / d.length) / m;
   if (cv < .15) other.push(`节拍表里 ${d.length} 段几乎一样长（平均 ${m.toFixed(1)} 秒），看起来会像在翻幻灯片。重点段放长（钩子、高潮、结尾），过渡段压短。`); }
+// 转场重复：同一种转场连用 3 次以上
+if (res.cuts) { let run = 1; for (let i = 1; i < res.cuts.length; i++) { run = res.cuts[i] === res.cuts[i - 1] ? run + 1 : 1; if (run === 3) other.push(`第 ${i - 1}～${i + 1} 个切点连用了 3 次「${res.cuts[i]}」转场。整片一种主转场没问题，但要隔几次插一个点缀，或改成在鼓点上硬切。`); } }
+if (res.blurWindows > 3) other.push(`整帧动态模糊开了 ${res.blurWindows} 段。只给最快的 1～3 下，用多了整片会发糊。`);
+const slideRisk = [deadRatio > .35 ? 2 : deadRatio > .15 ? 1 : 0, other.some(o => o.includes('几乎一样长') || o.includes('连用了 3 次')) ? 1 : 0];
 if (res.audio) { const { lufs, peak } = res.audio;
   if (lufs < -16 || lufs > -12) other.push(`整体响度 ${lufs.toFixed(1)} LUFS，平台标准是 -14 左右（${lufs < -16 ? '偏小，手机外放会比别的视频轻' : '偏大，会被平台压低还可能破音'}）。audio() 最后用 m.master() 会自动拉到 -14。`);
   if (peak > -.5) other.push(`峰值 ${peak.toFixed(1)} dB，太接近 0，可能破音。`); }
@@ -115,6 +126,8 @@ for (const type of Object.keys(NAMES)) { const list = keep.filter(i => i.type ==
   md += `## ${NAMES[type]}（${list.length}）\n\n${FIX[type]}\n\n`; for (const it of shown) md += `- ${type === 'overlap' ? it.s : '「' + it.s.trim().slice(0, 24) + '」'}　${fmt(it.runs)}${it.extra ? '　' + it.extra : ''}\n`;
   if (shown.length < list.length) md += `- ……另有 ${list.length - shown.length} 处更小的字没列出。装饰性的数据、英文小标可以不管；想让观众读的句子一律放大。\n`; md += '\n'; }
 if (other.length) { md += `## 画面、节奏和声音（${other.length}）\n\n`; for (const o of other) md += `- ${o}\n`; md += '\n'; }
+if (tips.length) { md += `## 建议（不算硬问题）\n\n`; for (const o of tips) md += `- ${o}\n`; md += '\n'; }
+md += `## 幻灯片风险\n\n- 死画面：${(deadRatio * 100).toFixed(0)}% 的时间画面几乎不动（${['好', '偏多', '太多，像幻灯片'][slideRisk[0]]}）\n- 重复：${slideRisk[1] ? '有（见上面的节奏、转场提醒）' : '没发现'}\n- 另外三项要自己看：动作有没有意义（不是为动而动）、说好的动画有没有变成静态卡片、是不是在用大段文字代替画面。\n\n`;
 if (errors.length) md += `## 页面报错\n\n${errors.slice(0, 8).map(e => '- ' + e).join('\n')}\n`;
 fs.writeFileSync(path.join(out, `check${tag}.md`), md);
 console.log(md); await close();
