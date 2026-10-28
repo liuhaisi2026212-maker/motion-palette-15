@@ -26,8 +26,14 @@
 - `references/`：通用手艺、渲染导出、踩坑、自查、一般模型做法
 - `references/styles/`：15 张风格门道卡 + 选风格索引
 - `starter/`：脚手架（改 `film.js` 就是做片子）
-- `examples/`：三套完整的参考作品（像素、扁平、综艺花字）
+- `examples/films/`：15 种风格各一支完整样片的源码（内容原创，学手法用）
+- `examples/kits/`：像素、扁平、综艺花字三套零件库
+- `LICENSE`、`NOTICE.md`、`licenses/`：许可和来源
 
 ## 底线
 
-学风格、学手法，不照搬别人的片子；字体、图片、音乐只用可商用的；导出失败就如实说。
+学风格、学手法，不照搬别人的片子；字体、图片、音乐只用可商用的；导出失败就如实说。版权和素材的细则见 `references/06-版权与素材.md`。
+
+## 许可
+
+MIT（见 `LICENSE`）。风格卡对照开源项目 [mg-styles-15](https://github.com/Vincentwei1021/mg-styles-15)（MIT）学习写成；自带字体为 SIL OFL 1.1，拼贴样片图片为 CC0。来源逐项列在 `NOTICE.md`。

@@ -5,7 +5,7 @@
 import { clamp, lerp, E, spring, hashStr, rng, timeline, shotAt, Mix, noteHz, imageURL, loadImage } from '../../lib/core.js';
 
 export const W = 1080, H = 1920;
-const BOLD = '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif';
+const BOLD = '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif';
 const FUN = '"ZCOOL KuaiLe", ' + BOLD, HAND = '"LXGW Marker Gothic", ' + BOLD;
 // 花字配色（字面渐变上→下、内描边、外描边、立体厚度）
 const INK = {

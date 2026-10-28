@@ -5,7 +5,7 @@ import { clamp, lerp, seg, E, spring, rng, Mix, backing } from './lib/core.js';
 import { grain } from './lib/draw.js';
 
 const W = 1920, H = 1080, DUR = 10.5;
-const CN = '"PingFang SC", "Noto Sans SC", sans-serif', SANS = '"Avenir Next", "Helvetica Neue", Arial, sans-serif';
+const CN = '"Noto Sans SC", "PingFang SC", sans-serif', SANS = '"Avenir Next", "Helvetica Neue", Arial, sans-serif';
 const INK = '#1E2630', RED = '#FF4A2E', BG = '#E8EDF2', NAVY = '#1E2630';
 let CUP, CUBE, PAGE, pctx;
 

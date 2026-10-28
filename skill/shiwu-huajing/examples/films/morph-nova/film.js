@@ -5,7 +5,7 @@ import { clamp, lerp, seg, E, Mix } from './lib/core.js';
 import { grain, vignette } from './lib/draw.js';
 
 const W = 1920, H = 1080, DUR = 9, NP = 64, CY = 540;
-const CREAM = '#EFE8DA', RED = '#F0442E', CN = '"PingFang SC", "Noto Sans SC", sans-serif', SANS = '"Avenir Next", "Helvetica Neue", Arial, sans-serif';
+const CREAM = '#EFE8DA', RED = '#F0442E', CN = '"Noto Sans SC", "PingFang SC", sans-serif', SANS = '"Avenir Next", "Helvetica Neue", Arial, sans-serif';
 const pt = (x, y) => Array.from({ length: NP }, () => [x, y]);
 const line = (x0, y0, x1, y1) => Array.from({ length: NP }, (_, i) => [lerp(x0, x1, i / (NP - 1)), lerp(y0, y1, i / (NP - 1))]);
 const ring = (cx, cy, r, a0 = Math.PI) => Array.from({ length: NP }, (_, i) => [cx + Math.cos(a0 + i / (NP - 1) * Math.PI * 2) * r, cy + Math.sin(a0 + i / (NP - 1) * Math.PI * 2) * r]);

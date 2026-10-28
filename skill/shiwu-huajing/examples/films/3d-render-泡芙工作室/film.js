@@ -5,7 +5,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { clamp, lerp, seg, E, rng, Mix } from './lib/core.js';
 
 const W = 1920, H = 1080, DUR = 8.5;
-const CN = '"PingFang SC", "Noto Sans SC", sans-serif';
+const CN = '"Noto Sans SC", "PingFang SC", sans-serif';
 let R, scene, cam, beads, letters = [], ball, dummy = new THREE.Object3D();
 const GX = 64, GZ = 40, SP = .3;
 const LAND = [.9, 1.25, 1.6, 1.95];            // 每个字母落地时间

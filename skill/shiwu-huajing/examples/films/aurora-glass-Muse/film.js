@@ -4,7 +4,7 @@ import { clamp, lerp, seg, E, rng, Mix } from './lib/core.js';
 import { grain } from './lib/draw.js';
 
 const W = 1920, H = 1080, DUR = 9;
-const CN = '"PingFang SC", "Noto Sans SC", sans-serif', SANS = '"Helvetica Neue", "PingFang SC", Arial, sans-serif';
+const CN = '"Noto Sans SC", "PingFang SC", sans-serif', SANS = '"Helvetica Neue", "PingFang SC", Arial, sans-serif';
 const BLOBS = [[420, 320, 620, '#6A4BFF', 0], [1500, 260, 560, '#2D6BFF', 1.7], [1200, 820, 640, '#35D0F0', 3.1], [560, 860, 520, '#B455F5', 4.4], [960, 520, 420, '#FF6FC8', 2.2]];
 let buf, bctx;
 

@@ -7,7 +7,7 @@ const W = 1920, H = 1080, M = 120, BPM = 120, BEAT = 60 / BPM, NB = 16;
 const L = 60, T0 = 60, R = W - 60, B0 = H - 60;                       // 版心（四周留给印刷标记）
 const C = { paper: '#F2EADB', red: '#E2283E', yellow: '#F7B500', blue: '#1D4FA8', black: '#141414', line: 'rgba(20,20,20,.10)' };
 const TEXT = { brand: 'FORM WEEK', cn: '形意周', tag: ['看', '想', '做'], tagEn: 'SEE · THINK · MAKE', head: '形意周 · 第 01 期', foot: 'FORM WEEK · 8 SECONDS · 16 BEATS' };
-const SANS = '"Futura", "Avenir Next", "Helvetica Neue", Arial, sans-serif', CN = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif';
+const SANS = '"Futura", "Avenir Next", "Helvetica Neue", Arial, sans-serif', CN = '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
 const bp = (t, k, dur = BEAT * .55) => E.inOutQ(seg(t, k * BEAT, k * BEAT + dur));   // 第 k 拍的动作进度（只用 inOutQ，不回弹）
 const gx = c => L + c * M, gy = r => T0 + r * M;                         // 网格坐标 → 像素
 

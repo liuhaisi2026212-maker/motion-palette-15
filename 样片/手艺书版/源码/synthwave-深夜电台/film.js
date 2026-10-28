@@ -3,7 +3,7 @@
 import { clamp, lerp, seg, E, rng, Mix } from './lib/core.js';
 
 const W = 1920, H = 1080, DUR = 9.5, HZ = 610;   // HZ：地平线
-const CN = '"PingFang SC", "Noto Sans SC", sans-serif', MONO = '"Courier New", Menlo, monospace', SCRIPT = '"Snell Roundhand", "Brush Script MT", "Segoe Script", cursive';
+const CN = '"Noto Sans SC", "PingFang SC", sans-serif', MONO = '"Courier New", Menlo, monospace', SCRIPT = '"Snell Roundhand", "Brush Script MT", "Segoe Script", cursive';
 const PINK = '#FF3FD0', CYAN = '#36E7FF';
 let buf, bctx, MTN = [];
 

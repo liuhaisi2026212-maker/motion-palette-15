@@ -4,7 +4,7 @@ import { clamp, lerp, seg, E, spring, rng, beats, Mix, backing } from './lib/cor
 import { text, fancyText, rrect, burst, speedLines, grain, vignette } from './lib/draw.js';
 
 const W = 1080, H = 1920, CX = 470;    // 右侧留给抖音按钮，主体略偏左
-const FUN = '"ZCOOL KuaiLe", sans-serif', HAND = '"LXGW Marker Gothic", sans-serif', CN = '"PingFang SC", "Noto Sans SC", sans-serif';
+const FUN = '"ZCOOL KuaiLe", sans-serif', HAND = '"LXGW Marker Gothic", sans-serif', CN = '"Noto Sans SC", "PingFang SC", sans-serif';
 const NAVY = '#1B1F4B';
 const TEXT = { show: '打工人日记', ep: 'EP.01', role: '本期主角', name: '咖啡杯', duty: '续命担当', warn: '周一预警', boom: '周一了!!', gauge: '困意检测', over: '爆表!', sub: '（小声）但还是得去上班', end: '冲鸭!', follow: '关注我～', stamp: ['打工人', '认证'], ring: 'MONDAY SURVIVOR · OFFICIAL · ' };
 const INK = {

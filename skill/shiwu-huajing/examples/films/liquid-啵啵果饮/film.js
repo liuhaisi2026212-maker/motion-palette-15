@@ -4,7 +4,7 @@ import { clamp, lerp, seg, E, spring, rng, Mix } from './lib/core.js';
 import { grain, vignette } from './lib/draw.js';
 
 const W = 1920, H = 1080, DUR = 9, SW = 960, SH = 540, K = 2, FLOOR = 770, T = .3;
-const CN = '"PingFang SC", "Noto Sans SC", sans-serif';
+const CN = '"Noto Sans SC", "PingFang SC", sans-serif';
 const CHARS = '啵啵果饮', CXS = [600, 840, 1080, 1320], CY = 560;
 let sim, sctx, img, field, CF = [];
 const COLS = [[255, 132, 60], [255, 88, 120], [240, 80, 170], [168, 84, 255]];

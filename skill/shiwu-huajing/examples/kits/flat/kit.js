@@ -5,7 +5,7 @@ import { clamp, lerp, inv, E, spring, hashStr, rng, timeline, shotAt, Mix, noteH
 import { ICONS, iconOf } from './icons.js';
 
 export const W = 1920, H = 1080;
-const FONT = '"Fredoka", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif';
+const FONT = '"Fredoka", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif';
 // 配色（每套：镜头底色轮换、深色、浅色、信使色、图标三色）
 export const PALETTES = {
   mint: { bg: ['#0E7C66', '#F6F1E6', '#FFD166', '#1B2A41', '#7FD1F5'], ink: '#14213D', light: '#FFFBF2', accent: '#FF6B35', a: '#FF6B35', b: '#FFD166', c: '#2EC4B6' },

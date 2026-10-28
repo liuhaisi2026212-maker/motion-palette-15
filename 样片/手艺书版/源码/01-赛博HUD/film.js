@@ -5,7 +5,7 @@ import { grain, vignette } from './lib/draw.js';
 
 const W = 1920, H = 1080, CX = 960, CY = 530, R = 390, RM = 322;
 const MONO = '"JetBrains Mono", "SF Mono", Menlo, Consolas, monospace';
-const CN = '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif';
+const CN = '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
 const CYAN = [63, 230, 255], AMBER = [255, 150, 40];
 const K = { frame: .12, ringOuter: .4, ringTicks: .55, ringInner: .7, panelL: .9, panelR: 1.15, hex: 1.2, map: 1.4, live: 2.4, sweepEnd: 4.6,
   signal: 4.4, cands: [4.9, 5.4, 5.9], brackets: 5.9, snap: 6.233, LOCK: 6.4, dive: [6.433, 7.7], coords: 7.25, pulses: [6.9, 7.4, 7.9, 8.4], uplink: [9.0, 9.4], off: 9.767, end: 10 };

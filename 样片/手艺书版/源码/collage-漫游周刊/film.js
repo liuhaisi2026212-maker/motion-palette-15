@@ -5,7 +5,7 @@ import { clamp, lerp, seg, E, spring, rng, Mix } from './lib/core.js';
 import { loadImage, grain, vignette } from './lib/draw.js';
 
 const W = 1920, H = 1080, DUR = 9.5;
-const IMPACT = '"Impact", "Haettenschweiler", "Arial Narrow Bold", sans-serif', CN = '"PingFang SC", "Noto Sans SC", sans-serif', MONO = '"Courier New", monospace';
+const IMPACT = '"Impact", "Haettenschweiler", "Arial Narrow Bold", sans-serif', CN = '"Noto Sans SC", "PingFang SC", sans-serif', MONO = '"Courier New", monospace';
 const INK = '#1C1A17', RED = '#D6332A', CREAM = '#F2EBDD';
 const A = {}; let CAM = null, LENS = { x: 330, y: 270, r: 150 };   // 相机图里镜头的位置
 const SQ = t => Math.floor(t * 12) / 12;                              // 定格动画：位置按 12fps 跳
