@@ -6,12 +6,20 @@
 
 ## 安装
 
-把整个 `shiwu-huajing` 文件夹拷到你的 Agent 的技能目录：
+一行安装（Claude Code、Codex、Cursor 等，需要 Node.js 22.20 以上）：
+
+```bash
+npx -y skills add liuhaisi2026212-maker/motion-palette-15 -g --all
+```
+
+或者手动把整个 `shiwu-huajing` 文件夹拷到你的 Agent 的技能目录：
 
 - Claude Code：`~/.claude/skills/shiwu-huajing/`
 - Codex：`~/.codex/skills/shiwu-huajing/`
 - 其他支持 Skill / 规则文件的 Agent（Cursor、Trae、国产 Agent 等）：放进项目里，让它先读 `SKILL.md`。
 - 只能聊天的平台（豆包、DeepSeek、Kimi 网页版等）：把 `SKILL.md`、`references/05-一般模型怎么做.md`、你要的那张风格卡（`references/styles/xxx.md`）一起上传或粘贴，再说你的主题。它会给你写出代码，你把代码放进 `starter/` 打开预览和导出。
+
+样片可以先在线看：https://liuhaisi2026212-maker.github.io/motion-palette-15/
 
 然后直接说：「用十五画境做一个 15 秒的像素风片头，主题是……」
 
