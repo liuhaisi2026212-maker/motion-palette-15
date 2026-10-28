@@ -2,6 +2,7 @@
 // 换成你自己的内容时：改 TEXT、PALETTE、节拍表，再按风格卡重写每一拍的画法。不要只换字就交差。
 import { clamp, lerp, seg, E, spring, squash, beats, Mix, backing, hz } from './lib/core.js';
 import { SANS, text, popText, circle, rrect, grain, vignette } from './lib/draw.js';
+import { camera, idle } from './lib/motion.js';
 
 const W = 1920, H = 1080;
 const TEXT = { title: '每天进步一点点', sub: 'A LITTLE BETTER EVERY DAY', end: 'tinystep' };
@@ -39,8 +40,9 @@ function drawGrow(ctx, t) {
 function drawEnd(ctx, t) {
   // 结尾：品牌名 + 停住，带一点呼吸
   ctx.fillStyle = PALETTE.ink; ctx.fillRect(0, 0, W, H);
-  const k = spring(t - B.end.t0, 2.2, .5), br = 1 + .015 * Math.sin((t - B.end.t0) * 4);
-  ctx.save(); ctx.translate(960, 520); ctx.scale(k * br, k * br); text(ctx, TEXT.end, 0, 0, { size: 170, weight: 800, color: PALETTE.bg2 }); ctx.restore();
+  // 停住以后也不死：idle 给一点漂浮和呼吸
+  const k = spring(t - B.end.t0, 2.2, .5), f = idle(t, 5, 5);
+  ctx.save(); ctx.translate(960 + f.x, 520 + f.y); ctx.rotate(f.r); ctx.scale(k * f.s, k * f.s); text(ctx, TEXT.end, 0, 0, { size: 170, weight: 800, color: PALETTE.bg2 }); ctx.restore();
   circle(ctx, 960 + 330, 470, 26 * k, PALETTE.hero);
 }
 
@@ -49,11 +51,14 @@ export default {
   fonts: [[`900 100px ${SANS}`, Object.values(TEXT).join('')]],
   draw(ctx, t) {
     ctx.fillStyle = PALETTE.bg; ctx.fillRect(0, 0, W, H);
+    // 镜头：全片慢推 4%；圆点落地、标题出来、结尾亮相这三下各冲击放大一次（对在音效上）
+    camera(ctx, t, { push: [0, B.duration, 1, 1.04], punch: [[B.hook.t0 + .55, .05], [B.title.t0 + .15, .04], [B.end.t0, .05]], shake: [[B.hook.t0 + .55, 10]] });
     if (t < B.hook.t1) drawHook(ctx, t);
     else if (t < B.title.t1) drawTitle(ctx, t);
     else if (t < B.wipe.t1) drawWipe(ctx, t);
     else if (t < B.grow.t1) drawGrow(ctx, t);
     else drawEnd(ctx, t);
+    ctx.restore();   // 和 camera 配对
     grain(ctx, t, .04); vignette(ctx, .25);
   },
   audio() {

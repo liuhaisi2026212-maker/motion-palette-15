@@ -5,7 +5,9 @@
   "description": "十五画境脚手架：浏览器里就能预览和导出；命令行抽帧/渲染才需要 puppeteer-core",
   "scripts": {
     "sheet": "node tools/sheet.mjs",
-    "render": "node tools/render.mjs"
+    "check": "node tools/check.mjs",
+    "render": "node tools/render.mjs",
+    "join": "node tools/join.mjs"
   },
   "optionalDependencies": {
     "puppeteer-core": "^23.0.0"

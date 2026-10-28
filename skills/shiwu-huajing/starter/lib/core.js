@@ -1,4 +1,4 @@
-// 脚手架核心：时间、缓动、随机数、启动片子、配乐合成。
+// 脚手架核心：时间、缓动、随机数、启动片子、配乐合成（自动拉响度）。
 // 约定：片子只由时间 t 决定（同一个 t 永远画出同一帧），这样才能逐帧导出、和配乐对齐。
 
 // ---------- 数学 ----------
@@ -34,18 +34,21 @@ export const noise1 = (x, seed = 0) => { const i = Math.floor(x), f = x - i, h =
 
 // ---------- 节拍表 ----------
 // beats([['hook', 1.5], ['grow', 2.5], ...]) → { hook: {t0, t1}, grow: {...}, duration }
-export function beats(list) { const out = {}; let t = 0; for (const [name, dur] of list) { out[name] = { t0: t, t1: t + dur, dur }; t += dur; } out.duration = t; return out; }
+export function beats(list) { const out = {}; let t = 0; for (const [name, dur] of list) { out[name] = { t0: t, t1: t + dur, dur }; t += dur; } out.duration = t;
+  if (typeof window !== 'undefined') (window.__BEATS ||= []).push(list.map(([name, dur]) => [name, dur]));   // 给 tools/check.mjs 看节奏用
+  return out; }
 
 // ---------- 启动片子 ----------
 // film = { width, height, fps, duration, fonts: [['900 100px "某字体"', '要用到的字']], setup(canvas) 可选, draw(ctx, t), audio() 可选 }
 export async function run(film, canvas = document.querySelector('canvas')) {
   canvas.width = film.width; canvas.height = film.height;
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).has('check')) await import('./guard.js');   // 检查模式：tools/check.mjs 用
   for (const [f, txt] of film.fonts || []) await document.fonts.load(f, txt || 'A').catch(() => {});
   await document.fonts.ready;
   if (film.setup) await film.setup(canvas);
   const ctx = canvas.getContext('2d');
   window.DEMO = { width: film.width, height: film.height, fps: film.fps || 30, duration: film.duration, motionBlur: { samples: 1, shutter: .5 } };
-  window.renderAt = async t => { t = clamp(t, 0, film.duration - 1e-4); ctx.save(); film.draw(ctx, t); ctx.restore(); };
+  window.renderAt = async t => { t = clamp(t, 0, film.duration - 1e-4); if (window.__GUARD) window.__GUARD.frame(t); ctx.save(); film.draw(ctx, t); ctx.restore(); };
   if (film.audio) window.MP_AUDIO = async () => film.audio();
   await window.renderAt(0); window.__ready = true;
 }
@@ -79,10 +82,37 @@ export class Mix {
   ding(t, vol = .18) { this.tone(t, .5, hz(91), { wave: 'sine', vol, env: [.001, .5, .05, .2] }); }
   thud(t, vol = .6) { this.tone(t, .4, 70, { wave: 'sine', vol, slide: -.6, env: [.001, .3, .1, .1] }); }
   echo(delay = .18, fb = .28, wet = .22) { const d = Math.floor(delay * SR); for (let i = d; i < this.n; i++) { this.L[i] += this.R[i - d] * fb * wet; this.R[i] += this.L[i - d] * fb * wet; } }
-  // 收尾：整体音量拉到合适（峰值约 -1dB），末尾 0.25 秒淡出
-  master(peak = .89) { let m = 1e-6; for (let i = 0; i < this.n; i++) m = Math.max(m, Math.abs(this.L[i]), Math.abs(this.R[i]));
-    const g = peak / m, fade = Math.floor(.25 * SR); for (let i = 0; i < this.n; i++) { const f = i > this.n - fade ? (this.n - i) / fade : 1; this.L[i] = Math.tanh(this.L[i] * g * 1.1) * f; this.R[i] = Math.tanh(this.R[i] * g * 1.1) * f; }
-    return { sampleRate: SR, left: this.L, right: this.R }; }
+  // 收尾：响度拉到 -14 LUFS（抖音、视频号、B 站都按这个标准），峰值压在 -1 dB 以内，末尾 0.25 秒淡出。
+  // master() 用默认值就行；想更轻一点写 master({ lufs: -16 })。旧写法 master(0.89) 还能用（只按峰值拉）。
+  master(o = {}) {
+    const fade = Math.floor(.25 * SR), n = this.n, L = this.L, R = this.R;
+    if (typeof o === 'number') { let m = 1e-6; for (let i = 0; i < n; i++) m = Math.max(m, Math.abs(L[i]), Math.abs(R[i]));
+      const g = o / m; for (let i = 0; i < n; i++) { const f = i > n - fade ? (n - i) / fade : 1; L[i] = Math.tanh(L[i] * g * 1.1) * f; R[i] = Math.tanh(R[i] * g * 1.1) * f; }
+      return { sampleRate: SR, left: L, right: R, lufs: loudness(L, R) }; }
+    const { lufs = -14, ceil = .89 } = o, now = loudness(L, R);
+    if (isFinite(now)) { const g = 10 ** ((lufs - now) / 20); for (let i = 0; i < n; i++) { L[i] *= g; R[i] *= g; } }
+    limit(L, R, ceil);
+    for (let i = n - fade; i < n; i++) { const f = (n - i) / fade; L[i] *= f; R[i] *= f; }
+    return { sampleRate: SR, left: L, right: R, lufs: loudness(L, R) }; }
+}
+// 响度（LUFS，按 ITU BS.1770：K 加权 + 400ms 分块 + 两道门限）。只认 48kHz
+export function loudness(L, R) {
+  const kw = x => { const y = new Float32Array(x.length); let a1 = 0, a2 = 0, b1 = 0, b2 = 0, c1 = 0, c2 = 0, d1 = 0, d2 = 0;
+    for (let i = 0; i < x.length; i++) { const v = x[i], s = 1.53512485958697 * v - 2.69169618940638 * a1 + 1.19839281085285 * a2 + 1.69065929318241 * b1 - .73248077421585 * b2; a2 = a1; a1 = v; b2 = b1; b1 = s;
+      const h = s - 2 * c1 + c2 + 1.99004745483398 * d1 - .99007225036621 * d2; c2 = c1; c1 = s; d2 = d1; d1 = h; y[i] = h; } return y; };
+  const l = kw(L), r = kw(R), blk = Math.floor(.4 * SR), hop = Math.floor(.1 * SR), ms = [];
+  for (let i = 0; i + blk <= l.length; i += hop) { let z = 0; for (let k = i; k < i + blk; k++) z += l[k] * l[k] + r[k] * r[k]; ms.push(z / blk); }
+  const lk = z => -.691 + 10 * Math.log10(z), avg = a => a.reduce((p, q) => p + q, 0) / a.length;
+  const g1 = ms.filter(z => lk(z) > -70); if (!g1.length) return -Infinity;
+  const rel = lk(avg(g1)) - 10, g2 = g1.filter(z => lk(z) > rel); return lk(avg(g2));
+}
+// 限幅：提前 5ms 看到峰值就把音量压下来，再用 80ms 慢慢放开（不会像硬削波那样破音）
+function limit(L, R, ceil) {
+  const n = L.length, look = Math.floor(.005 * SR), rel = Math.exp(-1 / (.08 * SR)), need = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const p = Math.max(Math.abs(L[i]), Math.abs(R[i])); need[i] = p > ceil ? ceil / p : 1; }
+  const q = [], minAhead = new Float32Array(n);   // 滑动窗口最小值：i 往后 look 个样本里要压得最狠的那个
+  for (let i = n - 1; i >= 0; i--) { while (q.length && need[q[q.length - 1]] >= need[i]) q.pop(); q.push(i); while (q[0] > i + look) q.shift(); minAhead[i] = need[q[0]]; }
+  let g = 1; for (let i = 0; i < n; i++) { const target = minAhead[i]; g = target < g ? target : target + (g - target) * rel; L[i] *= g; R[i] *= g; if (Math.abs(L[i]) > ceil) L[i] = Math.sign(L[i]) * ceil; if (Math.abs(R[i]) > ceil) R[i] = Math.sign(R[i]) * ceil; }
 }
 // 一段四拍子伴奏：bpm、根音（MIDI 号，60=中央 C）、和弦走向（相对根音的半音数组）
 export function backing(m, seconds, { bpm = 118, root = 60, prog = [[0, 4, 7], [-3, 0, 4], [-7, -3, 0], [-5, -1, 2]], drums = true, pad = 'saw', arp = 'sine', bass = 'tri' } = {}) {

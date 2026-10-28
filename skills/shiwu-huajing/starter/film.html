@@ -9,6 +9,8 @@ canvas { display: block; }
 <body><canvas></canvas>
 <script type="module">
 import { run } from './lib/core.js';
-import film from './film.js';
+// 默认放 film.js；地址后面加 ?film=films/hud.js 就单独放那一段（做合集时逐段检查用）
+const src = new URLSearchParams(location.search).get('film') || 'film.js';
+const film = (await import('./' + src.replace(/^\.?\//, ''))).default;
 run(film);
 </script></body></html>

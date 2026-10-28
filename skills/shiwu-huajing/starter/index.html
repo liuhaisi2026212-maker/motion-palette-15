@@ -58,7 +58,7 @@ const $ = id => document.getElementById(id), film = $('film'), stage = $('stage'
 let T = 0, DUR = 10, FPS = 30, VW = 1920, VH = 1080, playing = false, last = 0, busy = false, loaded = false, audio = null, actx = null, src = null;
 const fit = () => { film.style.transform = `scale(${stage.clientWidth / VW})`; }; new ResizeObserver(fit).observe(stage);
 // 打开 film.html；改了 film.js 以后刷新这个页面就行
-film.src = 'film.html?v=' + Date.now();
+film.src = 'film.html?' + (new URLSearchParams(location.search).get('film') ? 'film=' + encodeURIComponent(new URLSearchParams(location.search).get('film')) + '&' : '') + 'v=' + Date.now();   // index.html?film=films/hud.js 只预览这一段
 (function wait() { const w = film.contentWindow; let ok = false; try { ok = !!(w && w.__ready && w.renderAt); } catch (e) {}
   if (ok) { DUR = w.DEMO.duration; FPS = w.DEMO.fps; VW = w.DEMO.width; VH = w.DEMO.height; film.style.width = VW + 'px'; film.style.height = VH + 'px'; stage.classList.toggle('portrait', VH > VW); fit();
     $('veil').hidden = true; loaded = true; $('export').disabled = false; draw(); if (w.MP_AUDIO) w.MP_AUDIO().then(a => audio = a); return; }

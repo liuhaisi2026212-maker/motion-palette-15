@@ -43,6 +43,30 @@ export function fancyText(ctx, s, x, y, size, ink = {}, o = {}) {
   ctx.globalAlpha = .5; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.rect(-5000, -size * .5, 10000, size * .22); ctx.clip(); ctx.fillText(s, 0, 0);
   ctx.restore();
 }
+// 滚动数字：0 → to，按最终位数提前留好位置（每位数字等宽），后面跟的单位不会被压住、也不会左右跳。
+// counter(ctx, t, t0, dur, 100, x, y, { size, color, weight, font, align: 'left'|'right', unit: '件', unitSize })
+// 返回整组的宽度，方便在右边再接别的东西。
+export function counter(ctx, t, t0, dur, to, x, y, o = {}) {
+  const size = o.size || 120, v = Math.round(to * (o.ease || (u => 1 - (1 - u) ** 3))(clamp((t - t0) / dur))), digits = String(Math.abs(to)).length;
+  ctx.save(); ctx.font = `${o.weight || 900} ${size}px ${o.font || SANS}`; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
+  const cell = Math.max(...'0123456789'.split('').map(d => ctx.measureText(d).width)), numW = cell * digits;
+  const us = o.unitSize || size * .4, uw = o.unit ? (ctx.font = `${o.unitWeight || 700} ${us}px ${o.font || SANS}`, ctx.measureText(o.unit).width + size * .12) : 0, total = numW + uw;
+  const x0 = o.align === 'left' ? x : o.align === 'right' ? x - total : x - total / 2;
+  ctx.font = `${o.weight || 900} ${size}px ${o.font || SANS}`; ctx.fillStyle = o.color || '#111';
+  const str = String(v).padStart(digits, ' ');
+  [...str].forEach((d, i) => { if (d !== ' ') ctx.fillText(d, x0 + cell * (i + .5), y); });
+  if (o.unit) { ctx.font = `${o.unitWeight || 700} ${us}px ${o.font || SANS}`; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = o.unitColor || o.color || '#111'; ctx.fillText(o.unit, x0 + numW + size * .12, y + size * .36); }
+  ctx.restore(); return total;
+}
+// 读得清的字：自动判断背景深浅，给字加反差描边或半透明底板。字和背景颜色接近时用它。
+// readable(ctx, s, x, y, { size, color, plate: true|false, ...text 的其它参数 })
+export function readable(ctx, s, x, y, o = {}) {
+  const dark = luma(o.color || '#111') < .5, edge = dark ? 'rgba(255,255,255,.92)' : 'rgba(0,0,0,.72)';
+  if (o.plate) { const size = o.size || 60; ctx.save(); ctx.font = `${o.weight || 700} ${size}px ${o.font || SANS}`; const w = ctx.measureText(String(s)).width;
+    const al = o.align || 'center', bx = al === 'left' ? x - size * .4 : al === 'right' ? x - w - size * .4 : x - w / 2 - size * .4;
+    rrect(ctx, bx, y - size * .78, w + size * .8, size * 1.56, size * .3, dark ? 'rgba(255,255,255,.82)' : 'rgba(0,0,0,.55)'); ctx.restore(); return text(ctx, s, x, y, o); }
+  return text(ctx, s, x, y, { stroke: edge, strokeW: (o.size || 60) * .16, ...o });
+}
 // 适配字号：一行字超过 maxW 就缩小
 export function fitSize(ctx, s, size, maxW, weight = 900, font = SANS) { ctx.font = `${weight} ${size}px ${font}`; const w = ctx.measureText(s).width; return w > maxW ? size * maxW / w : size; }
 
