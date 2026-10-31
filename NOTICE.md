@@ -35,6 +35,7 @@
 |---|---|---|
 | mp4-muxer（Vanilagy） | `*/lib/mp4-muxer.js`、`legacy/v0.3-模板版/mp/` | MIT，附 `mp4-muxer.LICENSE` |
 | three.js | `legacy/v0.3-模板版/vendor/three/`；3D 样片运行时从 CDN 加载 | MIT |
+| Remotion、React（`starter/tools/remotion-lock.json` 锁定的版本） | 不随仓库分发，`node tools/remotion.mjs setup` 时才下载 | Remotion License（个人和员工不超过 3 人（含 3 人）的公司免费，更大的公司商用要买许可）；React 为 MIT |
 | d3、topojson-client | `legacy/v0.3-模板版/vendor/` | ISC |
 | opentype.js、simplex-noise | `legacy/v0.3-模板版/vendor/` | MIT |
 | hanzi-writer-data（源自 Make Me a Hanzi） | `legacy/v0.3-模板版/demos/05-cel-boil/assets/hanzi-medians.json` | Arphic Public License，附原文 |
@@ -51,6 +52,7 @@
 | Remotion（https://github.com/remotion-dev/remotion） | 感知缩放、推切转场的参数、转场与覆盖层分开 | Remotion License |
 | Motion Canvas（https://github.com/motion-canvas/motion-canvas） | 7 组弹簧预设的数值（`SPRINGS`）、放大钻入转场的缓动 | MIT |
 | Orkas VideoStudio（https://github.com/Orkas-AI/Orkas-VideoStudio） | 幻灯片风险关卡、第一帧当封面、反差 4.5 : 1、音效比画面早 10～20 毫秒 | MIT |
+| video-shotcraft（https://github.com/Vincentwei1021/video-shotcraft） | 风格卡头部的速查信息、可筛选的在线速查页和复制点单、并排打磨的流程和验收标准、全画面冲击的次数上限；从需求到方案的流程（简报表、两根轴定动效性格、方向静帧、分镜、独立复查）；`starter/tools/remotion.mjs` 的副工程做法（镜头卡不随仓库分发，用时从原仓库下载固定版本） | Apache-2.0 |
 
 ## 5. 免责
 

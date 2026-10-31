@@ -7,7 +7,9 @@
     "sheet": "node tools/sheet.mjs",
     "check": "node tools/check.mjs",
     "render": "node tools/render.mjs",
-    "join": "node tools/join.mjs"
+    "join": "node tools/join.mjs",
+    "compare": "node tools/compare.mjs",
+    "shot": "node tools/remotion.mjs"
   },
   "optionalDependencies": {
     "puppeteer-core": "^23.0.0"

@@ -22,7 +22,7 @@
 
 字体都是可商用开源字体（OFL），授权文件在 `assets/fonts/`。
 
-## 完整短片（`films/`）：15 种风格各一支
+## 完整短片（`films/`）：每种风格一支
 
 对照原版风格语法、内容全部原创的样片源码。每支一个 `film.js`（+ `film.html`），拷进一份 `starter/` 替换同名文件就能预览、导出。
 
@@ -43,5 +43,6 @@
 | `films/hud-寻猫雷达/` | hud | 找猫 | 满屏 HUD 版式、锁定戏、辉光故障 |
 | `films/bauhaus-形意周/` | bauhaus | 设计周 | 出血大几何、印刷外框、图案爆发 |
 | `films/variety-周一早上/` | variety-captions | 打工人 | 贴纸主体、栏目牌、名牌、仪表、相框 + 印章 |
+| `films/paper-shadow-纸上有戏/` | paper-shadow | 皮影小剧场 | 剪纸镂空（离屏画布 destination-out）、分块皮影人绕关节转、操纵杆、团花一瓣瓣展开（字体用 `assets/fonts/MaShanZheng-Regular.ttf`，拷进 `fonts/`） |
 
 用到开源字体的几支（cel-boil、variety）：把 `examples/assets/fonts/` 里的 `ZCOOLKuaiLe-Regular.ttf`、`LXGWMarkerGothic-Regular.ttf` 拷进 `starter/fonts/`。拼贴那支要连 `assets/` 一起拷。

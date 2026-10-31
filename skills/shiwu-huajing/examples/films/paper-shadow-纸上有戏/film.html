@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>film</title>
+<style>
+/* 需要的字体在这里声明（字体文件放 fonts/ 里，只用可商用的开源字体；examples/assets/fonts 里有几款现成的） */
+@font-face { font-family: 'Ma Shan Zheng'; src: url('fonts/MaShanZheng-Regular.ttf'); font-display: block; }
+html, body { margin: 0; background: #000; overflow: hidden; }
+canvas { display: block; }
+</style></head>
+<body><canvas></canvas>
+<script type="module">
+import { run } from './lib/core.js';
+// 默认放 film.js；地址后面加 ?film=films/hud.js 就单独放那一段（做合集时逐段检查用）
+const src = new URLSearchParams(location.search).get('film') || 'film.js';
+const film = (await import('./' + src.replace(/^\.?\//, ''))).default;
+run(film);
+</script></body></html>

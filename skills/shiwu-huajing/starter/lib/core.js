@@ -40,7 +40,8 @@ export function beats(list) { const out = {}; let t = 0; for (const [name, dur] 
 
 // ---------- 启动片子 ----------
 // film = { width, height, fps, duration, fonts: [['900 100px "某字体"', '要用到的字']], setup(canvas) 可选, draw(ctx, t), audio() 可选,
-//          motionBlur: { windows: [[t0, t1], ...], samples: 16, frames: 2 } 可选：只在这些时间段给整帧加动态模糊（快速甩镜头、推切时用） }
+//          motionBlur: { windows: [[t0, t1], ...], samples: 16, frames: 2 } 可选：只在这些时间段给整帧加动态模糊（快速甩镜头、推切时用），
+//          prepare(t) 可选：画 t 时刻之前要先等的异步准备（比如把视频片段跳到那一帧，见 lib/clip.js） }
 // fps 可以写 60：快节奏的片子更顺，导出时间和文件大小翻倍。
 export async function run(film, canvas = document.querySelector('canvas')) {
   canvas.width = film.width; canvas.height = film.height;
@@ -53,11 +54,11 @@ export async function run(film, canvas = document.querySelector('canvas')) {
   const inBlur = t => mb && (mb.windows || []).some(([a, b]) => t >= a && t <= b);
   window.renderAt = async t => {
     t = clamp(t, 0, film.duration - 1e-4); if (window.__GUARD) window.__GUARD.frame(t);
-    if (!inBlur(t)) { ctx.save(); film.draw(ctx, t); ctx.restore(); return; }
+    if (!inBlur(t)) { if (film.prepare) await film.prepare(t); ctx.save(); film.draw(ctx, t); ctx.restore(); return; }
     // 整帧动态模糊：在「上一帧 → 下一帧」之间均匀取 samples 个时刻，各画一遍再平均（对照 After Effects 实测的做法）
     const n = mb.samples || 16, span = (mb.frames ?? 2) / fps, W = canvas.width, H = canvas.height, acc = new Float32Array(W * H * 4);
     for (let i = 0; i < n; i++) { const tt = clamp(t + ((i + .5) / n - .5) * span, 0, film.duration - 1e-4);
-      ctx.save(); film.draw(ctx, tt); ctx.restore(); const d = ctx.getImageData(0, 0, W, H).data; for (let k = 0; k < d.length; k++) acc[k] += d[k]; }
+      if (film.prepare) await film.prepare(tt); ctx.save(); film.draw(ctx, tt); ctx.restore(); const d = ctx.getImageData(0, 0, W, H).data; for (let k = 0; k < d.length; k++) acc[k] += d[k]; }
     const img = ctx.createImageData(W, H); for (let k = 0; k < acc.length; k++) img.data[k] = acc[k] / n; ctx.putImageData(img, 0, 0);
   };
   if (film.audio) window.MP_AUDIO = async () => film.audio();

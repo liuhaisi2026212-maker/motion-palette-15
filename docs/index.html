@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>十五画境 · 15 种 MG 动画风格样片</title>
-<meta name="description" content="十五画境：给 AI 看的 MG 动画手艺书。15 种动态设计风格，各一支用代码做的原创样片，带声音在线观看。">
+<title>十五画境 · MG 动画风格样片</title>
+<meta name="description" content="十五画境：给 AI 看的 MG 动画手艺书。16 种动态设计风格，各一支用代码做的原创样片；可按场景筛选、悬停预览、复制点单语。">
 <style>
   :root { --bg: #0f0f12; --card: #18181d; --line: #2a2a31; --text: #ecebe6; --dim: #9a99a3; --accent: #ff8a3d; }
   * { box-sizing: border-box; }
@@ -31,14 +31,30 @@
   .meta h3 { margin: 2px 0 2px; font-size: 17px; }
   .meta p { margin: 0 0 8px; color: var(--dim); font-size: 14px; }
   .meta .links { font-size: 13px; display: flex; gap: 14px; }
+  .tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 0 0 18px; }
+  .tools input { flex: 1 1 100%; min-width: 0; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; }
+  .chip { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--dim); font: inherit; font-size: 13px; cursor: pointer; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #1a1006; font-weight: 600; }
+  .film { position: relative; }
+  .film video { cursor: pointer; }
+  .hint { position: absolute; top: 10px; right: 10px; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; pointer-events: none; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+  .tags span { font-size: 12px; padding: 1px 8px; border-radius: 999px; background: #24242b; color: var(--dim); }
+  .facts { font-size: 12px; color: var(--dim); margin: 0 0 10px; }
+  .fit { font-size: 13px; color: var(--dim); margin: 0 0 10px; }
+  .meta .links { align-items: center; flex-wrap: wrap; }
+  .copy { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; }
+  .empty { color: var(--dim); padding: 24px 0; }
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--accent); color: #1a1006; padding: 8px 16px; border-radius: 999px; font-weight: 600; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
   footer { margin: 56px 0 40px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>十五画境 · 15 种 MG 动画风格</h1>
-    <p class="lead">一本给 AI 看的 MG 动画手艺书。下面 15 支样片都是 AI 照着 skill 里的风格卡<b>用代码写出来的</b>：画面、动画、配乐全是代码，没有用生图或生视频模型。点开有声音。</p>
+    <h1>十五画境 · 16 种 MG 动画风格</h1>
+    <p class="lead">一本给 AI 看的 MG 动画手艺书。下面每支样片都是 AI 照着 skill 里的风格卡<b>用代码写出来的</b>：画面、动画、配乐全是代码，没有用生图或生视频模型。点开有声音。</p>
     <div class="actions">
       <a class="btn primary" href="https://github.com/liuhaisi2026212-maker/motion-palette-15">GitHub 仓库 · 安装方法</a>
       <a class="btn" href="https://github.com/liuhaisi2026212-maker/motion-palette-15/releases">下载原画质视频</a>
@@ -48,44 +64,54 @@
   <h2>45 秒总览</h2>
   <div class="reel"><video src="videos/00.mp4" poster="readme/cover.webp" controls playsinline preload="none"></video></div>
 
-  <h2>15 支样片</h2>
+  <h2>风格速查</h2>
+  <p class="lead" style="font-size:15px;margin:-6px 0 14px">鼠标移到样片上就会静音预览，点一下带声音看。看中了点「复制点单语」，贴给装好十五画境的 AI，补上你的主题就行。</p>
+  <div class="tools" id="tools"><input id="q" type="search" placeholder="搜风格、场景，比如：科技、手作、霓虹"></div>
   <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>没有对上的风格，换个词试试。</p>
+  <div class="toast" id="toast">已复制，贴给 AI 再补上主题</div>
 
   <footer>
-    风格卡对照开源项目 <a href="https://github.com/Vincentwei1021/mg-styles-15">mg-styles-15</a>（MIT）学习写成，样片内容均为原创。本项目 MIT 许可，来源见仓库 NOTICE.md。
+    前 15 张风格卡对照开源项目 <a href="https://github.com/Vincentwei1021/mg-styles-15">mg-styles-15</a>（MIT）学习写成，剪纸皮影是本项目新加的，样片内容均为原创。本项目 MIT 许可，来源见仓库 NOTICE.md。
   </footer>
 </div>
 <script>
+  // 数据来自 styles.json（由 docs/sync-styles.mjs 从每张风格卡的速查头生成，风格卡是唯一来源）
   const REPO = 'https://github.com/liuhaisi2026212-maker/motion-palette-15/blob/main/skills/shiwu-huajing/';
-  const FILMS = [
-    ['赛博 HUD', '寻猫雷达', '指挥舱屏幕铺满信息，只有一个焦点，全部为「锁定」那一下蓄力', 'hud', 'hud-寻猫雷达'],
-    ['综艺花字（竖屏）', '周一早上', '贴纸描边大字、放射背景、表情包式吐槽', 'variety-captions', 'variety-周一早上'],
-    ['包豪斯', '形意周', '几何色块出血、印刷标记、图案爆发', 'bauhaus', 'bauhaus-形意周'],
-    ['扁平矢量', '早一点', '无描边色块，一个小橙点串起所有转场', 'flat-vector', 'flat-vector-早一点'],
-    ['线条一笔画', '山间茶事', '一根线不断开，画出一整个故事', 'line-art', 'line-art-山间茶事'],
-    ['等轴 2.5D', '一亩田', '沙盘升起、白模生长、颜色从中心铺开', 'isometric', 'isometric-一亩田'],
-    ['3D 软萌', '泡芙工作室', '充气字落地回弹、珠子地面起波纹', '3d-render', '3d-render-泡芙工作室'],
-    ['逐帧手绘', '米米手作', '每两帧抖一次的线条、一笔一笔写出的字', 'cel-boil', 'cel-boil-米米手作'],
-    ['拼贴', '漫游周刊', '网点剪报、沿虚线剪开、撕纸转场', 'collage', 'collage-漫游周刊'],
-    ['液态', '啵啵果饮', '水滴溅开、分裂、融合成果冻字', 'liquid', 'liquid-啵啵果饮'],
-    ['形变', 'nova.', '点变线、线变圈、圈变字母', 'morph', 'morph-nova'],
-    ['复古霓虹 VHS', '深夜电台', '录像带界面、霓虹网格、条纹太阳、铬金大字', 'synthwave', 'synthwave-深夜电台'],
-    ['弥散玻璃', 'Muse', '层叠毛玻璃卡片、液态玻璃胶囊放大', 'aurora-glass', 'aurora-glass-Muse'],
-    ['知识科普贴纸', '一杯奶茶多少糖', '粗标题、数据逐格填满、画中画结论', 'sticker-explainer', 'sticker-explainer-奶茶多少糖'],
-    ['像素风', '厨房闯关记', '游戏 HUD、对话框、宝箱、昼夜变化', 'pixel', 'pixel-厨房闯关记'],
-  ];
-  const grid = document.getElementById('grid');
-  FILMS.forEach(([style, topic, line, card, film], i) => {
-    const n = String(i + 1).padStart(2, '0');
-    const el = document.createElement('article');
-    el.className = 'film';
-    el.innerHTML = `<video src="videos/${n}.mp4" poster="readme/films/${n}.webp" controls playsinline preload="none"></video>
-      <div class="meta"><div class="no">${n}</div><h3>${style} · ${topic}</h3><p>${line}</p>
-      <div class="links"><a href="${REPO}references/styles/${card}.md">风格卡</a><a href="${REPO}examples/films/${encodeURIComponent(film)}">源码</a></div></div>`;
-    grid.appendChild(el);
-  });
-  // 同一时间只放一支，开声音时不打架
-  document.addEventListener('play', e => document.querySelectorAll('video').forEach(v => v !== e.target && v.pause()), true);
+  const grid = document.getElementById('grid'), q = document.getElementById('q'), empty = document.getElementById('empty'), toast = document.getElementById('toast');
+  let STYLES = [], scene = '';
+  const hover = matchMedia('(hover: hover)').matches;
+  function order(s) { return `用十五画境的「${s.name}」风格，帮我做一支 15 秒的${s.frame || '横屏'}短片。主题：（在这里写你的主题和想让观众记住的一句话）`; }
+  function render() {
+    const kw = q.value.trim().toLowerCase(); grid.innerHTML = '';
+    const list = STYLES.filter(s => (!scene || s.tags.includes(scene)) && (!kw || [s.name, s.line, s.fit, s.tags.join(' '), s.topic].join(' ').toLowerCase().includes(kw)));
+    empty.hidden = list.length > 0;
+    for (const s of list) {
+      const el = document.createElement('article'); el.className = 'film';
+      el.innerHTML = `<video src="videos/${s.no}.mp4" poster="readme/films/${s.no}.webp" muted loop playsinline preload="none"></video><span class="hint">${hover ? '悬停预览 · 点击有声' : '点击播放'}</span>
+        <div class="meta"><div class="no">${s.no}</div><h3>${s.name} · ${s.topic}</h3><p>${s.line}</p>
+        <div class="tags">${s.tags.map(t => `<span>${t}</span>`).join('')}</div>
+        <div class="fit">适合：${s.fit}<br>不适合：${s.unfit}</div>
+        <div class="facts">能量 ${s.energy} · 动效性格 ${s.personality} · 难度 ${s.difficulty}</div>
+        <div class="links"><button class="copy" type="button">复制点单语</button><a href="${REPO}references/styles/${s.card}.md">风格卡</a><a href="${REPO}examples/films/${encodeURIComponent(s.film)}">源码</a></div></div>`;
+      const v = el.querySelector('video'), hint = el.querySelector('.hint');
+      if (hover) { el.addEventListener('mouseenter', () => { if (v.muted) v.play().catch(() => {}); }); el.addEventListener('mouseleave', () => { if (v.muted) { v.pause(); } }); }
+      v.addEventListener('click', () => { v.muted = false; v.controls = true; hint.hidden = true; v.play().catch(() => {}); });
+      el.querySelector('.copy').addEventListener('click', () => copy(order(s)));
+      grid.appendChild(el);
+    }
+  }
+  async function copy(text) { try { await navigator.clipboard.writeText(text); } catch { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    toast.classList.add('show'); clearTimeout(copy.timer); copy.timer = setTimeout(() => toast.classList.remove('show'), 1600); }
+  const tools = document.getElementById('tools');
+  function chips() { const count = {}; STYLES.forEach(s => s.tags.forEach(t => count[t] = (count[t] || 0) + 1));   // 场景按钮从风格卡的「场景」里来，用得多的排前面
+  ['全部', ...Object.keys(count).sort((a, b) => count[b] - count[a])].forEach(n => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (n === '全部' ? ' on' : ''); b.textContent = n;
+    b.onclick = () => { scene = n === '全部' ? '' : n; tools.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b)); render(); }; tools.appendChild(b); }); }
+  q.addEventListener('input', render);
+  fetch('styles.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(d => { STYLES = d; chips(); render(); })
+    .catch(() => { empty.hidden = false; empty.textContent = '风格数据没加载出来。直接双击打开本地文件时会这样，请用本地服务打开（见 docs/README.md），或者直接看在线版。'; });
+  // 同一时间只放一支带声音的，开声音时不打架
+  document.addEventListener('play', e => document.querySelectorAll('video').forEach(v => v !== e.target && !v.muted && v.pause()), true);
 </script>
 </body>
 </html>

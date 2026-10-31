@@ -1,6 +1,6 @@
 # 十五画境 shiwu-huajing
 
-一本给 AI 看的「用代码做 MG 动画短片」手艺书：15 种动态设计风格各自的门道、通用的节奏和排版手艺、踩坑清单、自查清单，外加一套能逐帧渲染、直接导出 MP4（带配乐）的脚手架。
+一本给 AI 看的「用代码做 MG 动画短片」手艺书：16 种动态设计风格各自的门道（风格不封顶，卡里没有的按模板先写卡）、从一句感觉到分镜的流程、通用的节奏和排版手艺、踩坑清单、自查清单，外加一套能逐帧渲染、直接导出 MP4（带配乐）的脚手架。
 
 不是模板库：AI 读完后按你的主题自己写画面代码，每次做出来都是新的片子。模型越强做得越好，一般的模型照着「一般模型怎么做」走，也能做到像样。
 
@@ -35,14 +35,16 @@ npx -y skills add liuhaisi2026212-maker/motion-palette-15 -g --all
    - `npm run sheet`：出一张缩略图总览。
    - `npm run render`：导出 MP4，需要 ffmpeg。
    - `npm run join -- 合集.mp4 a.mp4 b.mp4`：把几支 MP4 接成一支。
+   - `npm run compare -- 旧.mp4 新.mp4`：改前改后左右并排比，外加一张对照拼图，看不出变好的就别留。
 
 ## 目录
 
 - `SKILL.md`：入口，流程和文件地图
 - `references/`：通用手艺、动画手艺进阶、单风格与合集、渲染导出、踩坑、自查、一般模型做法
-- `references/styles/`：15 张风格门道卡 + 选风格索引
+- `references/styles/`：16 张风格门道卡 + 选风格索引 + 新风格卡模板
+- `references/09-从需求到方案.md`、`10-工具怎么选.md`：用户只说感觉时怎么定方案；Canvas、Three.js、Remotion 镜头卡怎么混用
 - `starter/`：脚手架（改 `film.js` 就是做片子）
-- `examples/films/`：15 种风格各一支完整样片的源码（内容原创，学手法用）
+- `examples/films/`：每种风格一支完整样片的源码（内容原创，学手法用）
 - `examples/kits/`：像素、扁平、综艺花字三套零件库
 - `LICENSE`、`NOTICE.md`、`licenses/`：许可和来源
 

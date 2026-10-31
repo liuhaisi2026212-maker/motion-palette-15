@@ -67,6 +67,9 @@ export function reel(items, { bpm = 0, bed = null, audioGap = 0 } = {}) {
       off = document.createElement('canvas'); off.width = W; off.height = H; offCtx = off.getContext('2d');
       for (const s of segs) if (s.film.setup) await s.film.setup(canvas);
     },
+    // 视频片段（lib/clip.js）画之前要先跳到那一帧：转场期间两段都在画，两段都要准备
+    async prepare(t) { let i = 0; while (i < segs.length - 1 && t >= segs[i + 1].t0) i++;
+      for (const s of [segs[i - 1], segs[i]]) if (s && s.film.prepare && t >= s.t0) await s.film.prepare(local(s, t)); },   // 吸拍留出空档时 local 会停在最后一帧，照样要跳过去
     draw(ctx, t) {
       let i = 0; while (i < segs.length - 1 && t >= segs[i + 1].t0) i++;   // 转场期间已经算进下一段
       const cur = segs[i], prev = segs[i - 1], c = cur.cut, inT = t - cur.t0;
@@ -85,12 +88,12 @@ export function reel(items, { bpm = 0, bed = null, audioGap = 0 } = {}) {
       ctx.restore();
     },
     cuts: segs.slice(1).map(s => s.cut.type),
-    audio() {
+    async audio() {
       // 每段的声音按位置混进来，再垫一层贯穿全片的底乐（可选），最后整体拉响度
       const m = new Mix(duration + .3);
       if (bed) bed(m, duration);
       for (const s of segs) {
-        if (!s.film.audio) continue; const a = s.film.audio(), i0 = Math.floor((s.t0 + audioGap) * SR), n = Math.min(a.left.length, Math.floor(s.dur * SR));
+        if (!s.film.audio) continue; const a = await s.film.audio(), i0 = Math.floor((s.t0 + audioGap) * SR), n = Math.min(a.left.length, Math.floor(s.dur * SR));
         const fadeIn = Math.floor((s.cut.dur || .02) * SR), fadeOut = Math.floor(.05 * SR), g = bed ? .7 : 1;
         for (let k = 0; k < n && i0 + k < m.n; k++) { if (i0 + k < 0) continue; const f = Math.min(1, k / fadeIn, (n - k) / fadeOut) * g; m.L[i0 + k] += a.left[k] * f; m.R[i0 + k] += a.right[k] * f; }
       }

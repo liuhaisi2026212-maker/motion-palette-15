@@ -2,15 +2,15 @@
 
 **想要一段片头动画、知识讲解动画，不会 AE、不想套模板的，把它丢给你的 AI。**
 
-当前版本 **0.6.0** · [更新记录](进度记录.md) · [所有发布](https://github.com/liuhaisi2026212-maker/motion-palette-15/releases)
+当前版本 **0.7.0** · [更新记录](进度记录.md) · [所有发布](https://github.com/liuhaisi2026212-maker/motion-palette-15/releases)
 
-它教 AI 用代码做 MG 动画短片：15 种动态设计风格，每种都写清楚了一眼认出它靠什么、画面怎么摆、10 秒的节奏怎么排、最容易做成「不像」的地方在哪。AI 读完按你的主题自己写画面和配乐，导出带声音的 MP4。每次都是新片子，不是换字的模板。
+它教 AI 用代码做 MG 动画短片。你只要说想要什么感觉（科技感、冲击力、高级、可爱……），AI 来定用哪种风格、哪些手法、哪个工具。现有 16 张风格卡，每张都写清楚了一眼认出它靠什么、画面怎么摆、10 秒的节奏怎么排、最容易做成「不像」的地方在哪；卡里没有的风格，按模板先写卡再做，风格数量不封顶。工具按画面挑：大多数用 Canvas，真 3D 用 Three.js，[video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) 的 124 张镜头卡可以用 Remotion 单独渲染再拼进来。导出带声音的 MP4，每次都是新片子，不是换字的模板。
 
-<p align="center"><a href="https://liuhaisi2026212-maker.github.io/motion-palette-15/"><img src="docs/readme/cover.webp" width="100%" alt="15 种风格各一支样片同时播放：赛博 HUD、综艺花字、包豪斯、扁平矢量、线条一笔画、等轴 2.5D、3D 软萌、逐帧手绘、拼贴、液态、形变、复古霓虹 VHS、弥散玻璃、知识科普贴纸、像素风"></a></p>
+<p align="center"><a href="https://liuhaisi2026212-maker.github.io/motion-palette-15/"><img src="docs/readme/cover.webp" width="100%" alt="前 15 种风格各一支样片同时播放：赛博 HUD、综艺花字、包豪斯、扁平矢量、线条一笔画、等轴 2.5D、3D 软萌、逐帧手绘、拼贴、液态、形变、复古霓虹 VHS、弥散玻璃、知识科普贴纸、像素风"></a></p>
 
-<p align="center"><a href="https://liuhaisi2026212-maker.github.io/motion-palette-15/"><b>▶ 带声音看 15 支样片</b></a> · <a href="https://github.com/liuhaisi2026212-maker/motion-palette-15/releases">下载原画质</a></p>
+<p align="center"><a href="https://liuhaisi2026212-maker.github.io/motion-palette-15/"><b>▶ 带声音看全部样片</b></a> · <a href="https://github.com/liuhaisi2026212-maker/motion-palette-15/releases">下载原画质</a></p>
 
-上面 15 支都是 AI 照着这本手艺书写代码做出来的：画面、动画、配乐全是代码，没有用生图或生视频模型。
+上面的样片都是 AI 照着这本手艺书写代码做出来的：画面、动画、配乐全是代码，没有用生图或生视频模型。
 
 ## 30 秒装上
 
@@ -59,7 +59,9 @@ npx -y skills add liuhaisi2026212-maker/motion-palette-15 -g --all
 
 **需要的环境：** 预览和导出要 Chrome 或 Edge，加 Node.js 或 Python 其中一个；命令行批量渲染要 ffmpeg。
 
-## 15 种风格
+## 16 种风格
+
+风格不封顶：卡里没有的，AI 会按[新风格卡模板](skills/shiwu-huajing/references/styles/_新风格卡模板.md)先写卡再做。
 
 <table>
 <tr>
@@ -87,6 +89,11 @@ npx -y skills add liuhaisi2026212-maker/motion-palette-15 -g --all
 <td align="center"><img src="docs/readme/films/14.webp" width="100%" alt="知识科普贴纸"><br><b>知识科普贴纸</b> · 一杯奶茶多少糖<br><sub>粗标题、数据逐格填满、画中画结论</sub><br><sub><a href="skills/shiwu-huajing/references/styles/sticker-explainer.md">风格卡</a> · <a href="skills/shiwu-huajing/examples/films/sticker-explainer-奶茶多少糖/">源码</a></sub></td>
 <td align="center"><img src="docs/readme/films/15.webp" width="100%" alt="像素风"><br><b>像素风</b> · 厨房闯关记<br><sub>游戏 HUD、对话框、宝箱、昼夜变化</sub><br><sub><a href="skills/shiwu-huajing/references/styles/pixel.md">风格卡</a> · <a href="skills/shiwu-huajing/examples/films/pixel-厨房闯关记/">源码</a></sub></td>
 </tr>
+<tr>
+<td align="center"><img src="docs/readme/films/16.webp" width="100%" alt="剪纸皮影"><br><b>剪纸皮影</b> · 纸上有戏<br><sub>油灯幕布、镂空皮影人提杆走、团花一瓣瓣展开</sub><br><sub><a href="skills/shiwu-huajing/references/styles/paper-shadow.md">风格卡</a> · <a href="skills/shiwu-huajing/examples/films/paper-shadow-纸上有戏/">源码</a></sub></td>
+<td></td>
+<td></td>
+</tr>
 </table>
 
 不知道选哪种：看[选风格](skills/shiwu-huajing/references/styles/00-选风格.md)，或者直接说主题，让 AI 给你推荐两三种。
@@ -95,6 +102,7 @@ npx -y skills add liuhaisi2026212-maker/motion-palette-15 -g --all
 
 直接说你现在的情况：
 
+- **只说感觉**：「给一个 AI 工具做 30 秒宣传片，要有科技感、有冲击力」。它先填一张需求简报，把感觉翻译成动效参数，选风格和工具，出几个方向的静帧，再排分镜。想一起定就说「先给我看方向」，它会在简报、方向、分镜三处停下来等你。
 - **点名风格**：「用像素风做一个 15 秒的片头，主题是新手第一次下厨，横屏」。
 - **不知道用哪种风格**：说主题和给谁看，它给 2～3 个候选，各一句理由。
 - **抖音竖屏**：说「竖屏 9:16」，综艺花字、知识科普贴纸最适合。
@@ -103,7 +111,7 @@ npx -y skills add liuhaisi2026212-maker/motion-palette-15 -g --all
 - **有品牌名、logo、照片**：一起发给它，它会放进片子里；没有品牌名它会编一个，不会用别人的。
 - **做完不满意**：说哪一秒哪里不对（最好截图），它对照风格卡改。
 
-它会先跟你确认主题、时长、横竖屏，再交节拍表，然后才写代码。导出前会跑一遍自动体检：查字号、字和背景的反差、会不会被抖音界面挡住、文字重叠、画面停住、节奏、响度，有问题改完再导出。交付时给 MP4、源码文件夹和一段说明。
+它会先填需求简报、定方案、排分镜，然后才写代码。导出前会跑一遍自动体检：查字号、字和背景的反差、会不会被抖音界面挡住、文字重叠、画面停住、节奏、响度，有问题改完再导出。能开子 agent 的环境里，交付前还会另开一个新的 agent 独立复查。交付时给 MP4、源码文件夹和一段说明。
 
 ## 它和直接让 AI 做动画有什么不一样
 
@@ -129,15 +137,20 @@ skills/shiwu-huajing/
 │   ├── 06-版权与素材.md      字体、图片、音乐、商标、AI 生成标识
 │   ├── 07-动画手艺进阶.md    三层动、镜头、进退场、关键帧、文字动法、段间衔接、竖屏规矩
 │   ├── 08-单风格与合集.md    单独出一种，或几种风格各一段拼成合集
-│   └── styles/              15 张风格卡 + 选风格
+│   ├── 09-从需求到方案.md    需求简报、感觉翻译成动效参数、选风格和手法、方向静帧、分镜
+│   ├── 10-工具怎么选.md      Canvas / Three.js / Remotion 镜头卡 / 现成视频，各渲各的再拼
+│   └── styles/              16 张风格卡 + 选风格 + 新风格卡模板
 ├── starter/                 脚手架：改 film.js 就是做片子，双击启动器预览导出；
-│                            自动体检、多段拼接和转场、动画工具（动态模糊、镜头、弹簧、慢快慢平移）、响度自动拉到 -14 LUFS
-└── examples/                15 支样片源码 + 像素 / 扁平 / 综艺花字零件库
+│                            自动体检、多段拼接和转场、视频片段拼接、Remotion 镜头渲染、并排对比、通用色板、
+│                            动画工具（动态模糊、镜头、弹簧、慢快慢平移）、响度自动拉到 -14 LUFS
+└── examples/                16 支样片源码 + 像素 / 扁平 / 综艺花字零件库
 ```
 
 ## 方法来源与维护
 
-风格卡对照开源项目 [mg-styles-15](https://github.com/Vincentwei1021/mg-styles-15)（作者 Vincentwei1021，MIT 许可）的 15 支样片学习总结：学它每种风格的版式、零件、节奏和质感，用自己的话写成卡片；样片的主题、文案、角色、构图、配乐全部重新做。感谢原作者公开了成片、提示词和完整源码。
+风格卡对照开源项目 [mg-styles-15](https://github.com/Vincentwei1021/mg-styles-15)（作者 Vincentwei1021，MIT 许可）的 15 支样片学习总结：学它每种风格的版式、零件、节奏和质感，用自己的话写成卡片；样片的主题、文案、角色、构图、配乐全部重新做。感谢原作者公开了成片、提示词和完整源码。第 16 种「剪纸皮影」是本项目自己加的。
+
+「从需求到方案」的流程（简报表、两根轴定动效性格、方向静帧、分镜、独立复查）和并排打磨，借鉴了同一作者的 [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft)（Apache-2.0）的思路，用自己的话重写；它的镜头卡不放进本仓库，用到时由 `starter/tools/remotion.mjs` 从原仓库下载固定版本。
 
 维护记录在 [进度记录.md](进度记录.md)：每一步做了什么、哪里被否定、为什么这么改。`legacy/` 里是两条已经放弃的路线（v0.3 改原片配置的模板版、只写镜头表的创作版），留作对照。
 
